@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang = "vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brand New Day</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!--Header-->
+    <div class="header">
+        <div class="logo">
+            <img src="logo.png" alt="Logo">
+            <h1>Spider-Verse</h1>
+        </div>
+        <div class="menu-toggle">
+            <img src="menu-toggle.png" alt="Menu-toggle">
+        </div>
+        <div class="nav">
+            <a href="#home">Home</a>
+            <a href="#overview">Overview</a>
+            <a href="#poster">Poster</a>
+            <a href="#related">Related Movies</a>
+            <a href="#booking">Booking</a>
+        </div>
+    </div>
+    <!--Hero-->
+    <div class="banner" id="home">
+        <div class="banner-content">
+            <h1 class="Spider-man" data-text="SPIDER-MAN">SPIDER-MAN</h1>
+            <p class="brand-new-day">BRAND NEW DAY</p>
+            <a href="#booking" class="btn-booking">Booking now</a>
+        </div>
+    </div>
+    <!--Overview-->
+    <section class="overview" id="overview">
+        <div class="container">
+            <h2>Overview</h2>
+            <p class="desc">It's a BRAND NEW DAY for Peter Parker. Fighting crime full-time as Spider-Man in a world that doesn’t remember him—and the pressure of seeing his old friends move on without him—sparks a change in Peter he may not have the power to control. But that transformation might also be the only thing that can stop a shocking new threat to the city and those he loves—a powerful villain no one can even see.</p>
+            <div class="info-grid">
+                <div>
+                    <h4>EXCUTIVE PRODUCERS</h4>
+                    <p>Louis D'Esposito, David Cain</p>
+                </div>
+                <div>
+                    <h4>Producers</h4>
+                    <p>Kevin Feige, Amy Pascal</p>
+                </div>
+                <div>
+                    <h4>Director</h4>
+                    <p>Destin Daniel Cretton</p>
+                </div>
+                <div>
+                    <h4>Cast</h4>
+                    <p>Tom Holland, Zendaya</p>
+                </div>
+                <div>
+                    <h4>Release date</h4>
+                    <p>July 31,2026</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="poster">
+        <h2 class="title">Posters</h2>
+        <div class="poster">
+            <div class="poster-item"><img src="poster1.png"></div>
+            <div class="poster-item"><img src="poster2.png"></div>
+            <div class="poster-item"><img src="poster3.png"></div>
+        </div>
+    </section>
+    <section id="related">
+        <h2 class="title">Related Movies</h2>
+        <div class="poster">
+            <div class="poster-item"><img src="movie1.png"></div>
+            <div class="poster-item"><img src="movie2.png"></div>
+            <div class="poster-item"><img src="movie3.png"></div>
+        </div>
+    </section>
+    <section class="contact" id="booking">
+        <form id="myForm">
+            <div class="form-group">
+            <h2 class="title">Get tickets</h2>
+                <input type="text" id="Name" placeholder="Name">
+                <small class="error"></small>
+            </div>
+            <div class="form-group">
+                <input type="text" id="Phone" placeholder="Phone">
+                <small class="error"></small>
+            </div>
+            <div class ="form-group">
+                <input type = "text" id="Mail" placeholder="Email">
+                <small class="error"></small>
+            </div>
+            <div class="form-group">
+            <textarea placeholder="Content"></textarea>
+            </div>
+            <button type="submit">Complete</button>
+            <p id="successMsg"></p>
+        </form>
+    </section>
+    <footer>
+        <div class="footer">
+        <p>@2026,kien06052006@gmail.com,Marvel</p>
+        </div>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
