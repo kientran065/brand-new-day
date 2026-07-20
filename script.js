@@ -49,7 +49,21 @@ form.addEventListener("submit", function(e) {
         form.reset();
     }
 });
-
+//Scroll to top button
+const btn = document.getElementById("scrollTopBtn");
+window.addEventListener("scroll", function () {
+    if (document.documentElement.scrollTop > 200) {
+        btn.style.display = "block";
+    } else {
+        btn.style.display = "none";
+    }
+});
+btn.addEventListener("click", function () {
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+});
 function showError(input, message) {
     input.classList.add("error-input");
     input.nextElementSibling.innerText = message;
