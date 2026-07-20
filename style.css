@@ -53,8 +53,8 @@ body{
 .banner{
     background:url("banner.jpg");
     width:auto;
-    height:70vh;
-    background-size:contain;
+    height:650px;
+    background-size:cover;
     background-repeat: no-repeat;
 }
 .banner-content{
@@ -185,33 +185,6 @@ body{
     }
     .brand-new-day{
         font-size: 20px;
-        margin-bottom: 120px;
-        margin-left:110px;
-        transform: translateY(-40px);
-        letter-spacing: 1px;
-    }
-    .btn-booking {
-        padding: 8px 16px;  /* nhỏ lại */
-        font-size: 12px;
-        border-radius: 6px;
-        bottom: 100px;
-        left:20px;
-        right:10px;
-        margin-left:70px;
-        transform: translateY(-40px);
-    }
-}
-@media (max-width:480px){
-    .Spider-man {
-        font-size: 20px; 
-        bottom: 1rem;
-        margin-left:120px;
-        transform: translateY(-30px);
-        letter-spacing: 1px;
-        position: relative;
-    }
-    .brand-new-day{
-        font-size: 10px;
         margin-bottom: 120px;
         margin-left:110px;
         transform: translateY(-40px);
