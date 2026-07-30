@@ -1,12 +1,12 @@
 html{
     scroll-behavior: smooth;
-    overflow-x: hidden;
 }
 body{
     margin:0;
     font-family: Arial, Helvetica, sans-serif;
     line-height: 1.35;
     height:2000px;
+    overflow-x: hidden;
 }
 .header{
     display: flex;
@@ -30,6 +30,10 @@ body{
     object-fit: cover;
     aspect-ratio: 1 / 1;
 }
+.nav{
+    display: flex;
+    align-items: center;
+}
 .nav a{
     margin-left:20px;
     text-decoration: none;
@@ -50,27 +54,192 @@ body{
     object-fit: cover;
     aspect-ratio: 1 / 1;
 }
-.banner{
-    background:url("banner.jpg");
-    width:auto;
-    height:650px;
-    background-size:cover;
-    background-repeat: no-repeat;
+.nav a:hover{
+    color:rgb(228, 228, 48);
 }
-.banner-content{
+/* Cart icon inside the nav */
+.nav-cart{
+    position: relative;
+    margin-left: 25px;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: 0.3s;
+}
+.nav-cart:hover{
+    color: #FFD700;
+    transform: scale(1.1);
+}
+#cart-count{
     position: absolute;
-    top: 35%;
-    left: 20%;
-    transform: translate(-50%, -50%);
+    top: -10px;
+    right: -12px;
+    background: red;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: bold;
+}
+/* Cart dropdown panel */
+.cart-dropdown{
+    position: fixed;
+    top: 0;
+    right: -360px;
+    width: 320px;
+    max-width: 100%;
+    height: 100%;
+    background: white;
+    box-shadow: -3px 0 15px rgba(0,0,0,0.3);
+    z-index: 10001;
+    display: flex;
+    flex-direction: column;
+    transition: right 0.35s ease;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+.cart-dropdown.show{
+    right: 0;
+}
+.cart-dropdown-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 20px;
+    background: red;
+    color: white;
+}
+.cart-dropdown-header h3{
+    margin: 0;
+}
+#closeCart{
+    cursor: pointer;
+    font-size: 26px;
+    line-height: 1;
+}
+.cart-items{
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px 20px;
+}
+.cart-empty{
+    color: gray;
     text-align: center;
+    margin-top: 30px;
+}
+.cart-item{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+.cart-item-info h4{
+    margin: 0 0 4px 0;
+    font-size: 15px;
+    word-break: break-word;
+}
+.cart-item-info span{
+    font-size: 13px;
+    color: gray;
+}
+.cart-item-actions{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.cart-item-actions button{
+    border: none;
+    background: #eee;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: bold;
+}
+.cart-item-actions button:hover{
+    background: #ccc;
+}
+.cart-item-remove{
+    background: none;
+    border: none;
+    color: red;
+    cursor: pointer;
+    font-size: 16px;
+    margin-left: 8px;
+}
+.cart-dropdown-footer{
+    padding: 15px 20px;
+    border-top: 2px solid #eee;
+}
+.cart-dropdown-footer p{
+    font-weight: bold;
+    margin: 0 0 10px 0;
+}
+#Booking{
     width: 100%;
+    padding: 10px;
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+#Booking:hover{
+    color:darkred;
+}
+#clearCart{
+    width: 100%;
+    padding: 10px;
+    background: #333;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+#clearCart:hover{
+    background: #555;
+}
+.cart-overlay{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 10000;
+    display: none;
+}
+.cart-overlay.show{
+    display: block;
+}
+.banner {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 7;
+  min-height: 220px;
+  overflow: hidden;
+  background: url("banner.jpg") center center/ contain no-repeat;
+  background-color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.banner-content {
+    text-align: center;
+    width: 90%;
+    max-width: 700px;
 }
 .Spider-man{
     font-family:"Impact","Arial Black",sans-serif;
     text-transform: uppercase;
     font-style: italic;
     letter-spacing: -4px;
-    font-size:96px;
+    font-size:clamp(28px, 8vw, 96px);
     color:#D31027;
     line-height:1;
     z-index:1;
@@ -90,27 +259,9 @@ body{
     color:#FFD700;
     font-weight: bold;
     text-transform: uppercase;
-    letter-spacing: 5px;
-    font-size:24px;
+    letter-spacing: clamp(2px, 1vw, 5px);
+    font-size:clamp(12px, 3vw, 24px);
     margin: 8px 0 0 0;
-}
-.btn-booking{
-    display: inline-block;
-    background: red;
-    color: white;
-    padding: 12px 25px;
-    text-decoration: none;
-    font-weight: bold;
-    border: none;
-    cursor: pointer;
-    border-radius: 8px;
-    transition: background 0.3s;
-    right:30px;
-    position: relative;
-}
-
-.btn-booking:hover{
-    background: darkred;
 }
 .title{
     text-align: center;
@@ -163,42 +314,119 @@ body{
     .nav a:nth-child(4) {
     grid-column: 1 / 2;
   }
-  
   /* Đặt mục thứ 5 (Booking) chiếm cột thứ hai ở hàng thứ 2 */
   .nav a:nth-child(5) {
     grid-column: 2 / 3;
   }
+    .nav-cart{
+        grid-column: 1 / 4;
+        margin: 10px 0 0 0;
+        justify-content: center;
+        padding: 12px 0;
+        border-top: 1px solid #555;
+    }
 
     .menu-toggle{
         display: block;
     }
-    .banner {
-        height: 250px; 
+    .cart-dropdown{
+        width: 100%;
+        right: -100%;
     }
-    .Spider-man {
-        font-size: 40px; 
-        bottom: 1rem;
-        margin-left:120px;
-        transform: translateY(-30px);
-        letter-spacing: 1px;
-        position: relative;
+    /* Luôn hiển thị nút scroll to top ở chế độ điện thoại */
+    #scrollTopBtn{
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
     }
-    .brand-new-day{
-        font-size: 20px;
-        margin-bottom: 120px;
-        margin-left:110px;
-        transform: translateY(-40px);
-        letter-spacing: 1px;
+}
+@media (min-width:769px) and (max-width:1024px){
+    .header{
+        padding: 15px 20px;
     }
-    .btn-booking {
-        padding: 8px 16px;  /* nhỏ lại */
-        font-size: 12px;
-        border-radius: 6px;
-        bottom: 100px;
-        left:20px;
-        right:10px;
-        margin-left:70px;
-        transform: translateY(-40px);
+    .nav a{
+        margin-left: 12px;
+        font-size: 16px;
+    }
+    .nav-cart{
+        margin-left: 15px;
+        font-size: 18px;
+    }
+    .info-grid{
+        grid-template-columns: repeat(3,1fr);
+        gap: 25px;
+    }
+    .poster{
+        grid-template-columns: repeat(3,1fr);
+        padding: 30px;
+    }
+    .container2{
+        grid-template-columns: repeat(2,250px);
+        gap: 30px;
+    }
+}
+/* ===== Small phones ===== */
+@media (max-width:480px){
+    .header{
+        padding: 12px 15px;
+    }
+    .logo h1{
+        font-size: 18px;
+    }
+    .logo img, .menu-toggle img{
+        width: 44px;
+        height: 44px;
+    }
+    .overview h2{
+        font-size: 28px;
+    }
+    .desc{
+        font-size: 15px;
+    }
+    .info-grid{
+        grid-template-columns: 1fr;
+        gap: 18px;
+        text-align: center;
+    }
+    .poster{
+        grid-template-columns: 1fr;
+        padding: 15px;
+        gap: 15px;
+    }
+    .item{
+        width: 100%;
+        max-width: 250px;
+    }
+    .cart-dropdown{
+        width: 100%;
+    }
+    #myForm{
+        width: 100%;
+        padding: 0 10px;
+        box-sizing: border-box;
+    }
+    .container2{
+        grid-template-columns: 1fr;
+        padding: 15px;
+        gap: 15px;
+    }
+}
+/* ===== Large screens ===== */
+@media (min-width:1400px){
+    .header{
+        padding: 20px 60px;
+    }
+    .container{
+        max-width: 1200px;
+    }
+    .poster{
+        max-width: 1300px;
+        margin: 0 auto;
+    }
+    .container2{
+        grid-template-columns: repeat(3,250px);
+        max-width:1200px;
+        margin: 0 auto;
     }
 }
 .overview h2{
@@ -234,32 +462,193 @@ body{
 }
 .poster-item{
     overflow: hidden;
-    border-radius: 15px;
+    border-radius: 20px;
 }
 .poster-item img{
     width: 100%;
-    height:auto;
+    height:600px;
     object-fit: contain;
     transition: 0.4s;
 }
 .poster-item:hover img{
     transform: scale(1.1);
 }
+.container2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* ✅ responsive */
+  gap: 20px;
+  padding: 0 20px;
+}
+.item {
+  width: 100%;
+  min-height: 350px;
+  perspective: 1000px;
+  transition: 0.4s;
+}
+.item:hover img{
+    transform: scale(1.1);
+}
+.card-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+/* khi click */
+.item.active .card-inner {
+  transform: rotateY(180deg);
+}
+
+/* 2 mặt */
+.front-card, .back-card {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  backface-visibility: hidden;
+  border-radius: 18px;
+  overflow: hidden;
+}
+/* mặt trước */
+.front-card {
+  background: #ccc;
+}
+.front-card img{
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* hoặc contain nếu muốn thấy full ảnh */
+}
+/* mặt sau */
+.back-card {
+  background: red;
+  color: white;
+  transform: rotateY(-180deg);
+  padding: 10px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+   overflow-y: auto;
+}
+.back-card h3{
+    text-align: center;
+     font-size: clamp(14px, 2vw, 18px);
+}
+.back-card p{
+    margin: 2px 0;
+    font-size: clamp(12px, 1.5vw, 14px);
+}
+.cart-card{
+    display: flex;
+    align-items: center;     /* căn giữa theo chiều dọc */
+    justify-content: center; /* căn giữa toàn bộ */
+    gap: 10px;               /* khoảng cách giữa chữ và icon */
+    cursor: pointer;
+}
+/* Quantity selector on product back-card */
+.qty-selector{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+}
+.qty-btn{
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: white;
+    color: black;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    line-height: 1;
+}
+.qty-btn:hover{
+    background: #ddd;
+}
+.qty-input{
+    width: 40px;
+    text-align: center;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 0;
+    font-weight: bold;
+}
+.cart-icon {
+  margin-top: 14px;
+  font-size: 22px;
+  background: white;
+  color: black;
+  padding: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.3s;
+}
+/* hover đẹp hơn */
+.cart-icon:hover {
+  transform: scale(1.2);
+  background: black;
+  color: white;
+}
+/* Booking modal overlay */
+.booking-overlay{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    z-index: 10002;
+    display: none;
+}
+.booking-overlay.show{
+    display: block;
+}
 .contact{
-    display:flex;
+    display:none;
     gap:30px;
-    padding:30px;
+    padding:30px 30px 10px 30px;
     max-width: 600px;
+    width: 90%;
     margin:0 auto;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    z-index: 10003;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+.contact.show{
+    display: block;
+}
+#closeBooking{
+    position: absolute;
+    top: 10px;
+    right: 18px;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+    color: #333;
+}
+#closeBooking:hover{
+    color: red;
 }
 #myForm{
     width: 300px;
-    margin:50px auto;
+    margin:20px auto 30px auto;
 }
 .form-group{
     margin-bottom: 15px;
     position: relative;
-    width:350px;
 }
 .form-group h2{
     text-align: center;
@@ -338,9 +727,68 @@ textarea:focus {
     background: darkred;
     transform: scale(1.1);
 }
+/* Floating cart button - stays fixed on screen while scrolling */
+.float-cart{
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 55px;
+    height: 55px;
+    background: red;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 9998;
+    transition: 0.3s;
+}
+.float-cart:hover{
+    background: darkred;
+    transform: scale(1.1);
+}
+#float-cart-count{
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #FFD700;
+    color: #333;
+    min-width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 0 3px;
+    box-sizing: border-box;
+}
 .footer{
     text-align: center;
     padding:20px;
     background: #333;
     color:white;
+    margin-top: 40px;
+}
+/* ===== Phone: Related Products xếp 1 hàng dọc, mỗi hàng 1 sản phẩm, căn giữa, giữ nguyên kích cỡ ===== */
+@media (max-width:768px){
+    .container2{
+        grid-template-columns: minmax(180px, 250px);
+        justify-content: center;
+    }
+}
+/* ===== Phone: Poster & Related Movies to hơn - xếp 1 cột, ảnh lớn ===== */
+@media (max-width:768px){
+    .poster{
+        grid-template-columns: 1fr;
+        padding: 20px;
+        gap: 25px;
+    }
+    .poster-item img{
+        height: 480px;
+    }
 }

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Brand New Day</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
     <!--Header-->
@@ -13,23 +14,54 @@
             <img src="logo.png" alt="Logo">
             <h1>Spider-Verse</h1>
         </div>
-        <div class="menu-toggle">
-            <img src="menu-toggle.png" alt="Menu-toggle">
-        </div>
+ 
         <div class="nav">
             <a href="#home">Home</a>
             <a href="#overview">Overview</a>
             <a href="#poster">Poster</a>
             <a href="#related">Related Movies</a>
-            <a href="#booking">Booking</a>
+            <a href="#products">Related Products</a>
+            <div class="nav-cart" id="navCart">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span id="cart-count">0</span>
+            </div>
+        </div>
+ 
+        <div class="menu-toggle">
+            <img src="menu-toggle.png" alt="Menu-toggle">
         </div>
     </div>
+ 
+    <!-- Cart dropdown panel -->
+    <div class="cart-dropdown" id="cartDropdown">
+        <div class="cart-dropdown-header">
+            <h3>Cart</h3>
+            <span id="closeCart">&times;</span>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <p class="cart-empty" id="cartEmpty">cartEmpty</p>
+        </div>
+        <div class="cart-dropdown-footer">
+            <p>Number of items: <span id="cartTotal">0</span></p>
+            <p>Total price: $<span id="cartTotalPrice">0</span></p>
+            <button id="Booking">Booking</button>
+            <hr>
+            <button id="clearCart">Delete</button>
+        </div>
+    </div>
+    <div class="cart-overlay" id="cartOverlay"></div>
+
+    <!-- Floating cart button - always visible while scrolling -->
+    <div class="float-cart" id="floatCart">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span id="float-cart-count">0</span>
+    </div>
+ 
     <!--Hero-->
     <div class="banner" id="home">
         <div class="banner-content">
             <h1 class="Spider-man" data-text="SPIDER-MAN">SPIDER-MAN</h1>
             <p class="brand-new-day">BRAND NEW DAY</p>
-            <a href="#booking" class="btn-booking">Booking now</a>
         </div>
     </div>
     <!--Overview-->
@@ -61,27 +93,25 @@
             </div>
         </div>
     </section>
-    
+ 
     <section id="poster">
-        <h2 class="title">Posters</h2>
-        <div class="poster">
-            <div class="poster-item"><img src="poster1.png"></div>
-            <div class="poster-item"><img src="poster2.png"></div>
-            <div class="poster-item"><img src="poster3.png"></div>
-        </div>
+        <h1 class="title">Posters</h1>
+        <div class="poster" id="posterContainer"></div>
     </section>
     <section id="related">
-        <h2 class="title">Related Movies</h2>
-        <div class="poster">
-            <div class="poster-item"><img src="movie1.png"></div>
-            <div class="poster-item"><img src="movie2.png"></div>
-            <div class="poster-item"><img src="movie3.png"></div>
-        </div>
+        <h1 class="title">Related Movies</h1>
+        <div class="poster" id="relatedContainer"></div>
     </section>
+    <section id="products">
+        <h1 class="title">Related Products</h1>
+        <div class="container2" id="productsContainer"></div>
+    </section>
+    <div class="booking-overlay" id="bookingOverlay"></div>
     <section class="contact" id="booking">
+        <span id="closeBooking">&times;</span>
         <form id="myForm">
             <div class="form-group">
-            <h2 class="title">Get tickets</h2>
+            <h1 class="title">Get tickets</h1>
                 <input type="text" id="Name" placeholder="Name">
                 <small class="error"></small>
             </div>
@@ -94,7 +124,7 @@
                 <small class="error"></small>
             </div>
             <div class="form-group">
-            <textarea placeholder="Content"></textarea>
+            <input placeholder="Content">
             </div>
             <button type="submit">Complete</button>
             <p id="successMsg"></p>
