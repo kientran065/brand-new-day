@@ -1,133 +1,5 @@
-html{
-    scroll-behavior: smooth;
-}
-body{
-    margin:0;
-    font-family: Arial, Helvetica, sans-serif;
-    line-height: 1.35;
-    height:2000px;
-    overflow-x: hidden;
-}
-.header{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding:15px 30px;
-    background-color: rgba(0, 0, 0, 0.8);
-    position: relative;
-
-}
-.logo{
-    display: flex;
-    align-items: center;
-    gap:10px;
-    color: white;
-}
-.logo img{
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    object-fit: cover;
-    aspect-ratio: 1 / 1;
-}
-.nav{
-    display: flex;
-    align-items: center;
-}
-.nav a{
-    margin-left:20px;
-    text-decoration: none;
-    color: white;
-    font-weight: bold;
-    gap: 20px;
-    font-size: 18px;
-}
-.menu-toggle{
-    display: none;
-    font-size:24px;
-    cursor: pointer;
-}
-.menu-toggle img{
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    object-fit: cover;
-    aspect-ratio: 1 / 1;
-}
-.nav a:hover{
-    color:rgb(228, 228, 48);
-}
-/* Cart icon inside the nav */
-.nav-cart{
-    position: relative;
-    margin-left: 25px;
-    color: white;
-    font-size: 20px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    transition: 0.3s;
-}
-.nav-cart:hover{
-    color: #FFD700;
-    transform: scale(1.1);
-}
-#cart-count{
-    position: absolute;
-    top: -10px;
-    right: -12px;
-    background: red;
-    color: white;
-    padding: 2px 6px;
-    border-radius: 50%;
-    font-size: 12px;
-    font-weight: bold;
-}
-/* Cart dropdown panel */
-.cart-dropdown{
-    position: fixed;
-    top: 0;
-    right: -360px;
-    width: 320px;
-    max-width: 100%;
-    height: 100%;
-    background: white;
-    box-shadow: -3px 0 15px rgba(0,0,0,0.3);
-    z-index: 10001;
-    display: flex;
-    flex-direction: column;
-    transition: right 0.35s ease;
-    box-sizing: border-box;
-    overflow-x: hidden;
-}
 .cart-dropdown.show{
     right: 0;
-}
-.cart-dropdown-header{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 18px 20px;
-    background: red;
-    color: white;
-}
-.cart-dropdown-header h3{
-    margin: 0;
-}
-#closeCart{
-    cursor: pointer;
-    font-size: 26px;
-    line-height: 1;
-}
-.cart-items{
-    flex: 1;
-    overflow-y: auto;
-    padding: 15px 20px;
-}
-.cart-empty{
-    color: gray;
-    text-align: center;
-    margin-top: 30px;
 }
 .cart-item{
     display: flex;
@@ -170,82 +42,10 @@ body{
     font-size: 16px;
     margin-left: 8px;
 }
-.cart-dropdown-footer{
-    padding: 15px 20px;
-    border-top: 2px solid #eee;
-}
-.cart-dropdown-footer p{
-    font-weight: bold;
-    margin: 0 0 10px 0;
-}
-#Booking{
-    width: 100%;
-    padding: 10px;
-    background: red;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-}
-#Booking:hover{
-    color:darkred;
-}
-#clearCart{
-    width: 100%;
-    padding: 10px;
-    background: #333;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-}
-#clearCart:hover{
-    background: #555;
-}
-.cart-overlay{
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 10000;
-    display: none;
-}
 .cart-overlay.show{
     display: block;
 }
-.banner {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 7;
-  min-height: 220px;
-  overflow: hidden;
-  background: url("banner.jpg") center center/ contain no-repeat;
-  background-color: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.banner-content {
-    text-align: center;
-    width: 90%;
-    max-width: 700px;
-}
 .Spider-man{
-    font-family:"Impact","Arial Black",sans-serif;
-    text-transform: uppercase;
-    font-style: italic;
-    letter-spacing: -4px;
-    font-size:clamp(28px, 8vw, 96px);
-    color:#D31027;
-    line-height:1;
-    z-index:1;
-    margin:0;
-    position: relative;
-    z-index: 1;
     text-shadow: /*Hieu ung do bong*/
         -1px -1px 0 #002D62, 1px -1px 0 #002D62, -1px 1px 0 #002D62, 1px 1px 0 #002D62,
         1px 1px 0 #002D62,
@@ -254,29 +54,8 @@ body{
         4px 4px 0 #001A3D,
         5px 5px 0 #001530;
 }
-.brand-new-day{
-    font-family:'Trebuchet MS',"Arial", sans-serif;
-    color:#FFD700;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: clamp(2px, 1vw, 5px);
-    font-size:clamp(12px, 3vw, 24px);
-    margin: 8px 0 0 0;
-}
-.title{
-    text-align: center;
-    margin-top:40;
-}
-.container{
-    max-width: 1000px;
-    margin:auto;
-    padding:30px 20px;
-}
 /*phone*/
 @media (max-width:768px){
-    .container{
-        flex-direction: column;
-    }
     .nav{
         display:none;
         position:absolute;
@@ -285,8 +64,7 @@ body{
         background: rgba(0, 0, 0, 0.8);
         width:100%;
         flex-direction: column;
-        transform: translateX(100%);
-        transition: 0.3s ease;
+        transform: translateX(100%);      
         padding: 10px;
         z-index: 9999;
     }
@@ -327,24 +105,12 @@ body{
         border-top: 1px solid #555;
     }
 
-    .menu-toggle{
-        display: block;
-    }
     .cart-dropdown{
         width: 100%;
         right: -100%;
     }
-    /* Luôn hiển thị nút scroll to top ở chế độ điện thoại */
-    #scrollTopBtn{
-        display: flex !important;
-        align-items: center;
-        justify-content: center;
-    }
 }
 @media (min-width:769px) and (max-width:1024px){
-    .header{
-        padding: 15px 20px;
-    }
     .nav a{
         margin-left: 12px;
         font-size: 16px;
@@ -352,10 +118,6 @@ body{
     .nav-cart{
         margin-left: 15px;
         font-size: 18px;
-    }
-    .info-grid{
-        grid-template-columns: repeat(3,1fr);
-        gap: 25px;
     }
     .poster{
         grid-template-columns: repeat(3,1fr);
@@ -368,26 +130,12 @@ body{
 }
 /* ===== Small phones ===== */
 @media (max-width:480px){
-    .header{
-        padding: 12px 15px;
-    }
     .logo h1{
         font-size: 18px;
     }
     .logo img, .menu-toggle img{
         width: 44px;
         height: 44px;
-    }
-    .overview h2{
-        font-size: 28px;
-    }
-    .desc{
-        font-size: 15px;
-    }
-    .info-grid{
-        grid-template-columns: 1fr;
-        gap: 18px;
-        text-align: center;
     }
     .poster{
         grid-template-columns: 1fr;
@@ -401,11 +149,6 @@ body{
     .cart-dropdown{
         width: 100%;
     }
-    #myForm{
-        width: 100%;
-        padding: 0 10px;
-        box-sizing: border-box;
-    }
     .container2{
         grid-template-columns: 1fr;
         padding: 15px;
@@ -414,12 +157,6 @@ body{
 }
 /* ===== Large screens ===== */
 @media (min-width:1400px){
-    .header{
-        padding: 20px 60px;
-    }
-    .container{
-        max-width: 1200px;
-    }
     .poster{
         max-width: 1300px;
         margin: 0 auto;
@@ -429,29 +166,6 @@ body{
         max-width:1200px;
         margin: 0 auto;
     }
-}
-.overview h2{
-    font-size:40px;
-    margin-bottom:20px;
-    text-align: center;
-}
-.desc{
-    font-size:18px;
-    line-height:1.6;
-    margin-bottom:40px;
-}
-.info-grid{
-    display:grid;
-    grid-template-columns: repeat(3,1fr);
-}
-.info-grid h4{
-    color:gray;
-    font-size:14px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-}
-.info-grid p{
-    font-weight: bold;
 }
 .poster{
     display: grid;
@@ -578,6 +292,8 @@ body{
     border-radius: 5px;
     padding: 5px 0;
     font-weight: bold;
+    color: black;
+    background: white;
 }
 .cart-icon {
   margin-top: 14px;
@@ -596,173 +312,14 @@ body{
   color: white;
 }
 /* Booking modal overlay */
-.booking-overlay{
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.6);
-    z-index: 10002;
-    display: none;
-}
 .booking-overlay.show{
     display: block;
-}
-.contact{
-    display:none;
-    gap:30px;
-    padding:30px 30px 10px 30px;
-    max-width: 600px;
-    width: 90%;
-    margin:0 auto;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%,-50%);
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    z-index: 10003;
-    max-height: 90vh;
-    overflow-y: auto;
 }
 .contact.show{
     display: block;
 }
-#closeBooking{
-    position: absolute;
-    top: 10px;
-    right: 18px;
-    font-size: 28px;
-    line-height: 1;
-    cursor: pointer;
-    color: #333;
-}
-#closeBooking:hover{
-    color: red;
-}
-#myForm{
-    width: 300px;
-    margin:20px auto 30px auto;
-}
-.form-group{
-    margin-bottom: 15px;
-    position: relative;
-}
-.form-group h2{
-    text-align: center;
-}
-input{
-    width:100%;
-    margin-bottom:15px;
-    padding:10px;
-    box-sizing: border-box;
-    border: 2px solid #ccc;
-    outline: none;
-    border-radius:5px;
-    transition: 0.3s;
-}
-input:focus{
-    border-color: #007bff;
-    box-shadow: 0 0 5px #007bff;
-}
 input.error-input{
     border-color: red;
-}
-.error{
-    color:red;
-    font-size: 12px;
-}
-#successMsg{
-    color:green;
-    margin-top: 10px;
-}
-#myForm button{
-    background-color: red;
-    color:white;
-    padding: 10px 20px;
-    border:none;
-    cursor: pointer;
-    font-weight: bold; 
-    border-radius:5px;
-    margin:15px auto 0 auto;
-    display: block;
-}
-#myForm button:hover{
-    background-color:darkred;
-}
-#scrollTopBtn{
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    display: none;              /* mặc định ẩn, JS đổi thành flex khi cần hiện */
-    background: red;
-    color: #fff;
-    border: none;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 30px;
-    padding: 0;                 /* bỏ padding mặc định của button */
-    line-height: 60px;          /* ⭐ ép line-height = chiều cao nút → chữ tự canh giữa theo chiều dọc */
-    text-align: center;         /* ⭐ canh giữa theo chiều ngang (thay cho justify-content vì đây là text, không phải flex item) */
-    justify-content: center;    /* giữ lại phòng khi bạn thêm icon SVG sau này */
-    align-items: center;
-    z-index: 1000;
-    transition: 0.3s;
-}
-#scrollTopBtn:hover{
-    background: darkred;
-    transform: scale(1.1);
-}
-/* Floating cart button - stays fixed on screen while scrolling */
-.float-cart{
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    width: 55px;
-    height: 55px;
-    background: red;
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    z-index: 9998;
-    transition: 0.3s;
-}
-.float-cart:hover{
-    background: darkred;
-    transform: scale(1.1);
-}
-#float-cart-count{
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    background: #FFD700;
-    color: #333;
-    min-width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    font-size: 12px;
-    font-weight: bold;
-    padding: 0 3px;
-    box-sizing: border-box;
-}
-.footer{
-    text-align: center;
-    padding:20px;
-    background: #333;
-    color:white;
-    margin-top: 40px;
 }
 /* ===== Phone: Related Products xếp 1 hàng dọc, mỗi hàng 1 sản phẩm, căn giữa, giữ nguyên kích cỡ ===== */
 @media (max-width:768px){

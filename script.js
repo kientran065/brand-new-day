@@ -128,7 +128,9 @@ productsContainer.addEventListener("change", (e) => {
     e.target.value = val;
 });
 
-// ================== CART (localStorage) ==================
+// ================== CART (API: GET/POST/PUT/DELETE) ==================
+const API_URL = "http://localhost:3000/api/cart";
+
 const cartCountEl = document.getElementById("cart-count");
 const floatCartCountEl = document.getElementById("float-cart-count");
 const cartItemsEl = document.getElementById("cartItems");
@@ -142,11 +144,20 @@ const closeCartBtn = document.getElementById("closeCart");
 const clearCartBtn = document.getElementById("clearCart");
 const booking = document.getElementById("Booking");
 
-// cart = [{ name, qty, price }]
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
+// cart = [{ id, name, qty, price }], luôn đồng bộ với dữ liệu trên server
+let cart = [];
 
-function saveCart() {
-    localStorage.setItem("cart", JSON.stringify(cart));
+// ---- GET: lấy giỏ hàng từ server khi tải trang ----
+async function fetchCart() {
+    try {
+        const res = await fetch(API_URL);
+        if (!res.ok) throw new Error("Không thể tải giỏ hàng");
+        cart = await res.json();
+    } catch (err) {
+        console.error("Lỗi GET /api/cart:", err);
+        cart = [];
+    }
+    renderCart();
 }
 
 function totalQty() {
@@ -170,7 +181,7 @@ function renderCart() {
         cartItemsEl.appendChild(cartEmptyEl);
         cartEmptyEl.style.display = "block";
     } else {
-        cart.forEach((item, index) => {
+        cart.forEach((item) => {
             const row = document.createElement("div");
             row.className = "cart-item";
             row.innerHTML = `
@@ -179,9 +190,9 @@ function renderCart() {
                     <span>Số lượng: ${item.qty} &times; $${item.price || 0} = $${(item.qty * (item.price || 0)).toFixed(2)}</span>
                 </div>
                 <div class="cart-item-actions">
-                    <button class="cart-minus" data-index="${index}">-</button>
-                    <button class="cart-plus" data-index="${index}">+</button>
-                    <button class="cart-item-remove" data-index="${index}">
+                    <button class="cart-minus" data-id="${item.id}">-</button>
+                    <button class="cart-plus" data-id="${item.id}">+</button>
+                    <button class="cart-item-remove" data-id="${item.id}">
                         <i class="fa-solid fa-trash"></i>
                     </button>
                 </div>
@@ -195,39 +206,82 @@ function renderCart() {
     updateCartCount();
 }
 
-function addToCart(name, qty, price) {
+// ---- POST: thêm sản phẩm vào giỏ ----
+async function addToCart(name, qty, price) {
     const finalPrice = (price === undefined || price === null || isNaN(price)) ? (PRICE_MAP[name] || 0) : price;
-    const existing = cart.find(item => item.name === name);
-    if (existing) {
-        existing.qty += qty;
-        if (existing.price === undefined || existing.price === null || isNaN(existing.price)) {
-            existing.price = finalPrice;
-        }
-    } else {
-        cart.push({ name, qty, price: finalPrice });
+    try {
+        const res = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, qty, price: finalPrice })
+        });
+        if (!res.ok) throw new Error("Không thể thêm vào giỏ hàng");
+        cart = await res.json();
+        renderCart();
+    } catch (err) {
+        console.error("Lỗi POST /api/cart:", err);
+        alert("Không thể thêm sản phẩm vào giỏ. Vui lòng kiểm tra server API.");
     }
-    saveCart();
-    renderCart();
 }
 
-// Tăng/giảm/xóa sản phẩm trong giỏ (event delegation)
+// ---- PUT: cập nhật số lượng theo id ----
+async function updateQty(id, qty) {
+    try {
+        const res = await fetch(`${API_URL}/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ qty })
+        });
+        if (!res.ok) throw new Error("Không thể cập nhật số lượng");
+        cart = await res.json();
+        renderCart();
+    } catch (err) {
+        console.error("Lỗi PUT /api/cart/:id:", err);
+    }
+}
+
+// ---- DELETE: xóa 1 sản phẩm theo id ----
+async function removeFromCart(id) {
+    try {
+        const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+        if (!res.ok) throw new Error("Không thể xóa sản phẩm");
+        cart = await res.json();
+        renderCart();
+    } catch (err) {
+        console.error("Lỗi DELETE /api/cart/:id:", err);
+    }
+}
+
+// ---- DELETE: xóa toàn bộ giỏ hàng ----
+async function clearCart() {
+    try {
+        const res = await fetch(API_URL, { method: "DELETE" });
+        if (!res.ok) throw new Error("Không thể xóa giỏ hàng");
+        cart = await res.json();
+        renderCart();
+    } catch (err) {
+        console.error("Lỗi DELETE /api/cart:", err);
+    }
+}
+
+// Tăng/giảm/xóa sản phẩm trong giỏ (event delegation, gọi API tương ứng)
 cartItemsEl.addEventListener("click", (e) => {
     const minusBtn = e.target.closest(".cart-minus");
     const plusBtn = e.target.closest(".cart-plus");
     const removeBtn = e.target.closest(".cart-item-remove");
     if (!minusBtn && !plusBtn && !removeBtn) return;
 
-    const idx = (minusBtn || plusBtn || removeBtn).dataset.index;
+    const id = (minusBtn || plusBtn || removeBtn).dataset.id;
+    const item = cart.find(i => i.id === id);
+    if (!item) return;
+
     if (minusBtn) {
-        cart[idx].qty -= 1;
-        if (cart[idx].qty <= 0) cart.splice(idx, 1);
+        updateQty(id, item.qty - 1); // server tự xóa nếu qty <= 0
     } else if (plusBtn) {
-        cart[idx].qty += 1;
+        updateQty(id, item.qty + 1);
     } else if (removeBtn) {
-        cart.splice(idx, 1);
+        removeFromCart(id);
     }
-    saveCart();
-    renderCart();
 });
 
 // Mở / đóng giỏ hàng
@@ -246,12 +300,10 @@ closeCartBtn.addEventListener("click", closeCart);
 cartOverlay.addEventListener("click", closeCart);
 
 clearCartBtn.addEventListener("click", () => {
-    cart = [];
-    saveCart();
-    renderCart();
+    clearCart();
 });
 
-renderCart(); // khởi tạo giỏ hàng khi load trang
+fetchCart(); // lấy giỏ hàng từ server khi load trang
 
 // ================== BOOKING MODAL ==================
 const bookingSection = document.getElementById("booking");
