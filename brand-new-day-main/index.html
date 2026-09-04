@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang = "vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brand New Day</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="m-0 font-[Arial,Helvetica,sans-serif] leading-[1.35] h-[2000px] overflow-x-hidden">
+    <!--Header-->
+    <div class="header flex justify-between items-center px-[1rem] py-[1.8rem] max-[480px]:px-[15px] max-[480px]:py-[12px] min-[769px]:max-[1024px]:px-[20px] min-[769px]:max-[1024px]:py-[15px] min-[1400px]:px-[60px] min-[1400px]:py-[20px] bg-black/80 relative">
+        <div class="logo flex items-center gap-2 text-white text-2xl">
+            <img class="w-[3.8rem] h-[3.8rem] rounded-full object-cover aspect-square" src="logo.png" alt="Logo">
+            <h1 class="text-white text-[16px] font-normal m-0">Spider-Verse</h1>
+        </div>
+ 
+        <div class="nav flex items-center">
+            <a href="#home" class="ml-5 no-underline text-white font-bold text-lg hover:text-[rgb(228,228,48)]">Home</a>
+            <a href="#overview" class="ml-5 no-underline text-white font-bold text-lg hover:text-[rgb(228,228,48)]">Overview</a>
+            <a href="#poster" class="ml-5 no-underline text-white font-bold text-lg hover:text-[rgb(228,228,48)]">Poster</a>
+            <a href="#related" class="ml-5 no-underline text-white font-bold text-lg hover:text-[rgb(228,228,48)]">Related Movies</a>
+            <a href="#products" class="ml-5 no-underline text-white font-bold text-lg hover:text-[rgb(228,228,48)]">Related Products</a>
+            <div class="nav-cart relative ml-5 text-white text-xl cursor-pointer flex items-center transition duration-300 hover:text-yellow-400 hover:scale-110" id="navCart">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span id="cart-count"class="absolute -top-[10px] -right-[12px] bg-red-500 text-white px-[6px] py-[2px] rounded-full text-[12px] font-bold">0</span>
+            </div>
+        </div>
+ 
+        <div class="menu-toggle hidden max-[768px]:block cursor-pointer text-2xl">
+            <img class="w-[5rem] h-[5rem] rounded-full object-cover aspect-square" src="menu-toggle.png" alt="Menu-toggle">
+        </div>
+    </div>
+ 
+    <!-- Cart dropdown panel -->
+    <div class="cart-dropdown fixed top-0 -right-[360px] w-[320px] max-w-full h-full bg-white shadow-[-3px_0_15px_rgba(0,0,0,0.3)] z-[10001] flex flex-col transition-[right] duration-[350ms] ease-[ease] box-border overflow-x-hidden" id="cartDropdown">
+        <div class="cart-dropdown-header flex justify-between items-center px-[20px] py-[18px] bg-red-500 text-white">
+            <h3 class="m-0">Cart</h3>
+            <span id="closeCart" class="cursor-pointer text-3xl leading-none">&times;</span>
+        </div>
+        <div class="cart-items flex-1 overflow-y-auto px-[20px] py-[15px]" id="cartItems">
+            <p class="cart-empty text-gray-500 text-center mt-[30px]" id="cartEmpty">cartEmpty</p>
+        </div>
+        <div class="cart-dropdown-footer px-[20px] py-[15px] border-t-2 border-[#eee]">
+            <p class="font-bold m-0 mb-[10px]">Number of items: <span id="cartTotal">0</span></p>
+            <p class="font-bold m-0 mb-[10px]">Total price: $<span id="cartTotalPrice">0</span></p>
+            <button id="Booking" class="w-full p-[10px] bg-red-600 text-white border-none rounded-[5px] cursor-pointer font-bold hover:text-[darkred]">Booking</button>
+            <hr>
+            <button id="clearCart" class="w-full p-[10px] bg-[#333] text-white border-none rounded-[5px] cursor-pointer font-bold hover:bg-[#555]">Delete</button>
+        </div>
+    </div>
+    <div class="cart-overlay hidden fixed inset-0 w-full h-full bg-black/50 z-[10000]" id="cartOverlay"></div>
+
+    <!-- Floating cart button - always visible while scrolling -->
+    <div class="float-cart fixed bottom-[20px] left-[20px] w-[55px] h-[55px] bg-red-600 text-white rounded-full flex items-center justify-center text-[22px] cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.3)] z-[9998] transition duration-300 hover:bg-[darkred] hover:scale-110" id="floatCart">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span id="float-cart-count" class="absolute -top-[6px] -right-[6px] bg-[#FFD700] text-[#333] min-w-[20px] h-[20px] flex items-center justify-center rounded-full text-[12px] font-bold px-[3px] box-border">0</span>
+    </div>
+ 
+    <!--Hero-->
+    <div class="banner relative w-full aspect-[16/7] min-h-[220px] overflow-hidden bg-[url('banner.jpg')] bg-center bg-contain bg-no-repeat bg-black flex items-center justify-center" id="home">
+        <div class="banner-content text-center w-[90%] max-w-[700px]">
+            <h1 class="Spider-man font-['Impact','Arial_Black',sans-serif] uppercase italic tracking-[-4px] text-[clamp(28px,8vw,96px)] text-[#D31027] leading-none m-0 relative z-[1]" data-text="SPIDER-MAN">SPIDER-MAN</h1>
+            <p class="brand-new-day font-['Trebuchet_MS','Arial',sans-serif] text-[#FFD700] font-bold uppercase tracking-[clamp(2px,1vw,5px)] text-[clamp(12px,3vw,24px)] mt-[8px] mb-0 mx-0">BRAND NEW DAY</p>
+        </div>
+    </div>
+    <!--Overview-->
+    <section class="overview" id="overview">
+        <div class="container max-w-[1000px] min-[1400px]:max-w-[1200px] mx-auto px-[20px] py-[30px]">
+            <h2 class="text-[40px] max-[480px]:text-[28px] mb-[20px] text-center">Overview</h2>
+            <p class="desc text-[18px] leading-[1.6] mb-[40px] max-[480px]:text-[15px]">It's a BRAND NEW DAY for Peter Parker. Fighting crime full-time as Spider-Man in a world that doesn’t remember him—and the pressure of seeing his old friends move on without him—sparks a change in Peter he may not have the power to control. But that transformation might also be the only thing that can stop a shocking new threat to the city and those he loves—a powerful villain no one can even see.</p>
+            <div class="info-grid grid grid-cols-3 min-[769px]:max-[1024px]:gap-[25px] max-[480px]:grid-cols-1 max-[480px]:gap-[18px] max-[480px]:text-center">
+                <div>
+                    <h4 class="text-gray-500 text-[14px] tracking-[2px] uppercase">EXCUTIVE PRODUCERS</h4>
+                    <p class="font-bold">Louis D'Esposito, David Cain</p>
+                </div>
+                <div>
+                    <h4 class="text-gray-500 text-[14px] tracking-[2px] uppercase">Producers</h4>
+                    <p class="font-bold">Kevin Feige, Amy Pascal</p>
+                </div>
+                <div>
+                    <h4 class="text-gray-500 text-[14px] tracking-[2px] uppercase">Director</h4>
+                    <p class="font-bold">Destin Daniel Cretton</p>
+                </div>
+                <div>
+                    <h4 class="text-gray-500 text-[14px] tracking-[2px] uppercase">Cast</h4>
+                    <p class="font-bold">Tom Holland, Zendaya</p>
+                </div>
+                <div>
+                    <h4 class="text-gray-500 text-[14px] tracking-[2px] uppercase">Release date</h4>
+                    <p class="font-bold">July 31,2026</p>
+                </div>
+            </div>
+        </div>
+    </section>
+ 
+    <section id="poster">
+        <h1 class="title text-center">Posters</h1>
+        <div class="poster" id="posterContainer"></div>
+    </section>
+    <section id="related">
+        <h1 class="title text-center">Related Movies</h1>
+        <div class="poster" id="relatedContainer"></div>
+    </section>
+    <section id="products">
+        <h1 class="title text-center">Related Products</h1>
+        <div class="container2" id="productsContainer"></div>
+    </section>
+    <div class="booking-overlay hidden fixed inset-0 w-full h-full bg-black/60 z-[10002]" id="bookingOverlay"></div>
+    <section class="contact hidden gap-[30px] pt-[30px] px-[30px] pb-[10px] max-w-[600px] w-[90%] mx-auto fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] z-[10003] max-h-[90vh] overflow-y-auto" id="booking">
+        <span id="closeBooking" class="absolute top-[10px] right-[18px] text-[28px] leading-none cursor-pointer text-[#333] hover:text-red-600">&times;</span>
+        <form id="myForm" class="w-[300px] max-[480px]:w-full max-[480px]:px-[10px] max-[480px]:box-border mt-[20px] mb-[30px] mx-auto">
+            <div class="form-group mb-[15px] relative">
+            <h1 class="title text-center">Get tickets</h1>
+                <input type="text" id="Name" placeholder="Name" class="w-full mb-[15px] p-[10px] box-border border-2 border-[#ccc] outline-none rounded-[5px] transition duration-300 focus:border-[#007bff] focus:shadow-[0_0_5px_#007bff]">
+                <small class="error text-red-600 text-[12px]"></small>
+            </div>
+            <div class="form-group mb-[15px] relative">
+                <input type="text" id="Phone" placeholder="Phone" class="w-full mb-[15px] p-[10px] box-border border-2 border-[#ccc] outline-none rounded-[5px] transition duration-300 focus:border-[#007bff] focus:shadow-[0_0_5px_#007bff]">
+                <small class="error text-red-600 text-[12px]"></small>
+            </div>
+            <div class ="form-group mb-[15px] relative">
+                <input type = "text" id="Mail" placeholder="Email" class="w-full mb-[15px] p-[10px] box-border border-2 border-[#ccc] outline-none rounded-[5px] transition duration-300 focus:border-[#007bff] focus:shadow-[0_0_5px_#007bff]">
+                <small class="error text-red-600 text-[12px]"></small>
+            </div>
+            <div class="form-group mb-[15px] relative">
+            <input id="Content" placeholder="Content" class="w-full mb-[15px] p-[10px] box-border border-2 border-[#ccc] outline-none rounded-[5px] transition duration-300 focus:border-[#007bff] focus:shadow-[0_0_5px_#007bff]">
+            </div>
+            <button type="submit" class="bg-red-600 text-white px-[20px] py-[10px] border-none cursor-pointer font-bold rounded-[5px] mt-[15px] mx-auto mb-0 block hover:bg-[darkred]">Complete</button>
+            <p id="successMsg" class="text-green-600 mt-[10px]"></p>
+        </form>
+    </section>
+    <div id="scrollTopBtn" class="fixed bottom-[20px] right-[20px] hidden bg-red-600 text-white border-none w-[60px] h-[60px] rounded-full cursor-pointer text-[30px] p-0 leading-[60px] text-center justify-center items-center z-[1000] transition duration-300 hover:bg-[darkred] hover:scale-110 max-[768px]:!flex">↑</div>
+    <footer>
+        <div class="footer text-center p-[20px] bg-[#333] text-white mt-[40px]">
+        <p>@2026,kien06052006@gmail.com,Marvel</p>
+        </div>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
