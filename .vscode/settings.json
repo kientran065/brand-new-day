@@ -3,5 +3,6 @@
         "**/backend/**",
         "**/node_modules/**",
         "**/*.json"
-    ]
+    ],
+    "liveServer.settings.port": 5501
 }

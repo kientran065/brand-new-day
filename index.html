@@ -22,6 +22,10 @@
             <a href="#poster" class="ml-5 no-underline text-white font-bold text-lg hover:text-[rgb(228,228,48)]">Poster</a>
             <a href="#related" class="ml-5 no-underline text-white font-bold text-lg hover:text-[rgb(228,228,48)]">Related Movies</a>
             <a href="#products" class="ml-5 no-underline text-white font-bold text-lg hover:text-[rgb(228,228,48)]">Related Products</a>
+            <div class="nav-auth relative ml-5 text-white text-lg cursor-pointer flex items-center gap-2 hover:text-[rgb(228,228,48)]" id="navAuth" title="Bấm để đăng nhập">
+                <i class="fa-solid fa-user"></i>
+                <span id="authLabel">Login</span>
+            </div>
             <div class="nav-cart relative ml-5 text-white text-xl cursor-pointer flex items-center transition duration-300 hover:text-yellow-400 hover:scale-110" id="navCart">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span id="cart-count"class="absolute -top-[10px] -right-[12px] bg-red-500 text-white px-[6px] py-[2px] rounded-full text-[12px] font-bold">0</span>
@@ -107,6 +111,26 @@
         <h1 class="title text-center">Related Products</h1>
         <div class="container2" id="productsContainer"></div>
     </section>
+    <!-- Auth modal (Login / Register) -->
+    <div class="auth-overlay hidden fixed inset-0 w-full h-full bg-black/60 z-[10002]" id="authOverlay"></div>
+    <section class="auth hidden gap-[20px] pt-[30px] px-[30px] pb-[25px] max-w-[380px] w-[90%] mx-auto fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] z-[10003]" id="authSection">
+        <span id="closeAuth" class="absolute top-[10px] right-[18px] text-[28px] leading-none cursor-pointer text-[#333] hover:text-red-600">&times;</span>
+        <div class="auth-tabs flex justify-center gap-[10px] mt-[10px] mb-[10px] border-b border-[#eee]">
+            <button type="button" id="tabLogin" class="font-bold px-[15px] py-[10px] border-b-2 border-red-600 text-red-600 bg-transparent">Đăng nhập</button>
+            <button type="button" id="tabRegister" class="font-bold px-[15px] py-[10px] border-b-2 border-transparent text-gray-400 bg-transparent">Đăng ký</button>
+        </div>
+        <form id="authForm" class="w-full">
+            <div class="form-group mb-[15px] relative">
+                <input type="email" id="AuthEmail" placeholder="Email" class="w-full mb-[15px] p-[10px] box-border border-2 border-[#ccc] outline-none rounded-[5px] transition duration-300 focus:border-[#007bff] focus:shadow-[0_0_5px_#007bff]">
+            </div>
+            <div class="form-group mb-[15px] relative">
+                <input type="password" id="AuthPassword" placeholder="Password (tối thiểu 6 ký tự)" class="w-full mb-[15px] p-[10px] box-border border-2 border-[#ccc] outline-none rounded-[5px] transition duration-300 focus:border-[#007bff] focus:shadow-[0_0_5px_#007bff]">
+            </div>
+            <button type="submit" id="authSubmitBtn" class="w-full bg-red-600 text-white px-[20px] py-[10px] border-none cursor-pointer font-bold rounded-[5px] hover:bg-[darkred]">Đăng nhập</button>
+            <p id="authMsg" class="text-center mt-[12px] text-[13px] text-red-600"></p>
+        </form>
+    </section>
+
     <div class="booking-overlay hidden fixed inset-0 w-full h-full bg-black/60 z-[10002]" id="bookingOverlay"></div>
     <section class="contact hidden gap-[30px] pt-[30px] px-[30px] pb-[10px] max-w-[600px] w-[90%] mx-auto fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] z-[10003] max-h-[90vh] overflow-y-auto" id="booking">
         <span id="closeBooking" class="absolute top-[10px] right-[18px] text-[28px] leading-none cursor-pointer text-[#333] hover:text-red-600">&times;</span>
@@ -125,7 +149,7 @@
                 <small class="error text-red-600 text-[12px]"></small>
             </div>
             <div class="form-group mb-[15px] relative">
-            <input placeholder="Content" class="w-full mb-[15px] p-[10px] box-border border-2 border-[#ccc] outline-none rounded-[5px] transition duration-300 focus:border-[#007bff] focus:shadow-[0_0_5px_#007bff]">
+            <input id="Content" placeholder="Content" class="w-full mb-[15px] p-[10px] box-border border-2 border-[#ccc] outline-none rounded-[5px] transition duration-300 focus:border-[#007bff] focus:shadow-[0_0_5px_#007bff]">
             </div>
             <button type="submit" class="bg-red-600 text-white px-[20px] py-[10px] border-none cursor-pointer font-bold rounded-[5px] mt-[15px] mx-auto mb-0 block hover:bg-[darkred]">Complete</button>
             <p id="successMsg" class="text-green-600 mt-[10px]"></p>
@@ -137,6 +161,9 @@
         <p>@2026,kien06052006@gmail.com,Marvel</p>
         </div>
     </footer>
+    <!-- Firebase Authentication SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

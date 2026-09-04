@@ -128,8 +128,92 @@ productsContainer.addEventListener("change", (e) => {
     e.target.value = val;
 });
 
-// ================== CART (API: GET/POST/PUT/DELETE) ==================
+// ================== CART (MOCK API dùng fetch giả lập, không cần backend) ==================
 const API_URL = "http://localhost:3000/api/cart";
+// Độ trễ giả lập (ms) để giữ cảm giác gọi API qua mạng thật
+const MOCK_DELAY = 300;
+
+// Sinh id ngẫu nhiên cho item mới (thay cho id do server sinh ra trước đây)
+function generateId() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+// Đọc / ghi giỏ hàng vào localStorage - đóng vai trò "database" của mock server
+function loadCartFromStorage() {
+    try {
+        const raw = localStorage.getItem("spiderverse_cart");
+        return raw ? JSON.parse(raw) : [];
+    } catch (err) {
+        console.error("Lỗi đọc giỏ hàng từ localStorage:", err);
+        return [];
+    }
+}
+
+function saveCartToStorage(data) {
+    try {
+        localStorage.setItem("spiderverse_cart", JSON.stringify(data));
+    } catch (err) {
+        console.error("Lỗi lưu giỏ hàng vào localStorage:", err);
+    }
+}
+
+// ---- MOCK FETCH: đóng vai "backend", xử lý GET/POST/PUT/DELETE giống hệt server thật ----
+// Trả về Promise<Response> y hệt fetch() thật (.ok, .status, .json()), nên phần code
+// gọi bên dưới viết đúng như đang gọi fetch tới một API thật.
+function mockFetch(url, options = {}) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            try {
+                const method = (options.method || "GET").toUpperCase();
+                const idMatch = url.match(new RegExp(`^${API_URL}/(.+)$`));
+                const id = idMatch ? idMatch[1] : null;
+                let data = loadCartFromStorage();
+                let responseData;
+
+                if (method === "GET") {
+                    responseData = data;
+
+                } else if (method === "POST") {
+                    const body = JSON.parse(options.body || "{}");
+                    const existing = data.find(i => i.name === body.name && i.price === body.price);
+                    if (existing) existing.qty += body.qty;
+                    else data.push({ id: generateId(), name: body.name, qty: body.qty, price: body.price });
+                    saveCartToStorage(data);
+                    responseData = data;
+
+                } else if (method === "PUT" && id) {
+                    const body = JSON.parse(options.body || "{}");
+                    if (body.qty <= 0) {
+                        data = data.filter(i => i.id !== id); // tự xóa nếu qty <= 0
+                    } else {
+                        const item = data.find(i => i.id === id);
+                        if (item) item.qty = body.qty;
+                    }
+                    saveCartToStorage(data);
+                    responseData = data;
+
+                } else if (method === "DELETE" && id) {
+                    data = data.filter(i => i.id !== id);
+                    saveCartToStorage(data);
+                    responseData = data;
+
+                } else if (method === "DELETE" && !id) {
+                    data = [];
+                    saveCartToStorage(data);
+                    responseData = data;
+
+                } else {
+                    resolve({ ok: false, status: 404, json: () => Promise.resolve({ error: "Not found" }) });
+                    return;
+                }
+
+                resolve({ ok: true, status: 200, json: () => Promise.resolve(responseData) });
+            } catch (err) {
+                reject(err);
+            }
+        }, MOCK_DELAY);
+    });
+}
 
 const cartCountEl = document.getElementById("cart-count");
 const floatCartCountEl = document.getElementById("float-cart-count");
@@ -147,10 +231,10 @@ const booking = document.getElementById("Booking");
 // cart = [{ id, name, qty, price }], luôn đồng bộ với dữ liệu trên server
 let cart = [];
 
-// ---- GET: lấy giỏ hàng từ server khi tải trang ----
+// ---- GET: lấy giỏ hàng khi tải trang (qua mockFetch, xử lý bất đồng bộ với await) ----
 async function fetchCart() {
     try {
-        const res = await fetch(API_URL);
+        const res = await mockFetch(API_URL);
         if (!res.ok) throw new Error("Không thể tải giỏ hàng");
         cart = await res.json();
     } catch (err) {
@@ -206,11 +290,11 @@ function renderCart() {
     updateCartCount();
 }
 
-// ---- POST: thêm sản phẩm vào giỏ ----
+// ---- POST: thêm sản phẩm vào giỏ (qua mockFetch) ----
 async function addToCart(name, qty, price) {
     const finalPrice = (price === undefined || price === null || isNaN(price)) ? (PRICE_MAP[name] || 0) : price;
     try {
-        const res = await fetch(API_URL, {
+        const res = await mockFetch(API_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name, qty, price: finalPrice })
@@ -220,14 +304,14 @@ async function addToCart(name, qty, price) {
         renderCart();
     } catch (err) {
         console.error("Lỗi POST /api/cart:", err);
-        alert("Không thể thêm sản phẩm vào giỏ. Vui lòng kiểm tra server API.");
+        alert("Không thể thêm sản phẩm vào giỏ.");
     }
 }
 
-// ---- PUT: cập nhật số lượng theo id ----
+// ---- PUT: cập nhật số lượng theo id (qua mockFetch) ----
 async function updateQty(id, qty) {
     try {
-        const res = await fetch(`${API_URL}/${id}`, {
+        const res = await mockFetch(`${API_URL}/${id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ qty })
@@ -240,10 +324,10 @@ async function updateQty(id, qty) {
     }
 }
 
-// ---- DELETE: xóa 1 sản phẩm theo id ----
+// ---- DELETE: xóa 1 sản phẩm theo id (qua mockFetch) ----
 async function removeFromCart(id) {
     try {
-        const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+        const res = await mockFetch(`${API_URL}/${id}`, { method: "DELETE" });
         if (!res.ok) throw new Error("Không thể xóa sản phẩm");
         cart = await res.json();
         renderCart();
@@ -252,10 +336,10 @@ async function removeFromCart(id) {
     }
 }
 
-// ---- DELETE: xóa toàn bộ giỏ hàng ----
+// ---- DELETE: xóa toàn bộ giỏ hàng (qua mockFetch) ----
 async function clearCart() {
     try {
-        const res = await fetch(API_URL, { method: "DELETE" });
+        const res = await mockFetch(API_URL, { method: "DELETE" });
         if (!res.ok) throw new Error("Không thể xóa giỏ hàng");
         cart = await res.json();
         renderCart();
@@ -305,6 +389,132 @@ clearCartBtn.addEventListener("click", () => {
 
 fetchCart(); // lấy giỏ hàng từ server khi load trang
 
+// ================== FIREBASE AUTHENTICATION ==================
+// TODO: thay bằng config thật lấy từ Firebase Console (Project settings > Your apps)
+const firebaseConfig = {
+    apiKey: "AIzaSyDGATweoKsqIJHldK2I8pr1q9iT24RbkYE",
+    authDomain: "brandnewday-76f45.firebaseapp.com",
+    projectId: "brandnewday-76f45",
+    storageBucket: "brandnewday-76f45.firebasestorage.app",
+    messagingSenderId: "123888001540",
+    appId: "1:123888001540:web:89162d8308b122699fcb51",
+    measurementId: "G-85DT28XCNF"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+let currentUser = null; // user hiện tại (null nếu chưa đăng nhập)
+
+const navAuth = document.getElementById("navAuth");
+const authLabel = document.getElementById("authLabel");
+const authOverlay = document.getElementById("authOverlay");
+const authSection = document.getElementById("authSection");
+const closeAuthBtn = document.getElementById("closeAuth");
+const authForm = document.getElementById("authForm");
+const authEmailInput = document.getElementById("AuthEmail");
+const authPasswordInput = document.getElementById("AuthPassword");
+const authSubmitBtn = document.getElementById("authSubmitBtn");
+const authMsg = document.getElementById("authMsg");
+const tabLogin = document.getElementById("tabLogin");
+const tabRegister = document.getElementById("tabRegister");
+
+let authMode = "login"; // "login" | "register"
+
+function setAuthMode(mode) {
+    authMode = mode;
+    authMsg.innerText = "";
+    if (mode === "login") {
+        tabLogin.classList.add("border-red-600", "text-red-600");
+        tabLogin.classList.remove("border-transparent", "text-gray-400");
+        tabRegister.classList.add("border-transparent", "text-gray-400");
+        tabRegister.classList.remove("border-red-600", "text-red-600");
+        authSubmitBtn.innerText = "Đăng nhập";
+    } else {
+        tabRegister.classList.add("border-red-600", "text-red-600");
+        tabRegister.classList.remove("border-transparent", "text-gray-400");
+        tabLogin.classList.add("border-transparent", "text-gray-400");
+        tabLogin.classList.remove("border-red-600", "text-red-600");
+        authSubmitBtn.innerText = "Đăng ký";
+    }
+}
+
+function openAuthModal(mode = "login") {
+    setAuthMode(mode);
+    authForm.reset();
+    authSection.classList.add("show");
+    authOverlay.classList.add("show");
+}
+function closeAuthModal() {
+    authSection.classList.remove("show");
+    authOverlay.classList.remove("show");
+}
+
+// Bấm vào icon user: chưa đăng nhập -> mở modal; đã đăng nhập -> hỏi đăng xuất
+navAuth.addEventListener("click", () => {
+    if (currentUser) {
+        if (confirm(`Đăng xuất tài khoản ${currentUser.email}?`)) {
+            auth.signOut();
+        }
+    } else {
+        openAuthModal("login");
+    }
+});
+closeAuthBtn.addEventListener("click", closeAuthModal);
+authOverlay.addEventListener("click", closeAuthModal);
+tabLogin.addEventListener("click", () => setAuthMode("login"));
+tabRegister.addEventListener("click", () => setAuthMode("register"));
+
+// Dịch mã lỗi Firebase sang thông báo tiếng Việt dễ hiểu
+function translateAuthError(code) {
+    const map = {
+        "auth/email-already-in-use": "Email này đã được đăng ký.",
+        "auth/invalid-email": "Email không đúng định dạng.",
+        "auth/weak-password": "Mật khẩu phải có ít nhất 6 ký tự.",
+        "auth/user-not-found": "Tài khoản không tồn tại.",
+        "auth/wrong-password": "Sai mật khẩu.",
+        "auth/invalid-credential": "Email hoặc mật khẩu không đúng.",
+        "auth/too-many-requests": "Bạn thử sai quá nhiều lần, vui lòng thử lại sau."
+    };
+    return map[code] || "Đã có lỗi xảy ra, vui lòng thử lại.";
+}
+
+authForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    authMsg.innerText = "";
+    const email = authEmailInput.value.trim();
+    const password = authPasswordInput.value;
+
+    if (!email) { authMsg.innerText = "Vui lòng nhập email"; return; }
+    if (!password || password.length < 6) { authMsg.innerText = "Mật khẩu tối thiểu 6 ký tự"; return; }
+
+    authSubmitBtn.disabled = true;
+    try {
+        if (authMode === "login") {
+            await auth.signInWithEmailAndPassword(email, password);
+        } else {
+            await auth.createUserWithEmailAndPassword(email, password);
+        }
+        closeAuthModal();
+    } catch (err) {
+        console.error("Lỗi Firebase Auth:", err);
+        authMsg.innerText = translateAuthError(err.code);
+    } finally {
+        authSubmitBtn.disabled = false;
+    }
+});
+
+// Theo dõi trạng thái đăng nhập, tự động cập nhật giao diện header
+auth.onAuthStateChanged((user) => {
+    currentUser = user;
+    if (user) {
+        authLabel.innerText = user.email.split("@")[0]; // hiện phần trước @ cho gọn
+        navAuth.title = "Bấm để đăng xuất";
+    } else {
+        authLabel.innerText = "Login";
+        navAuth.title = "Bấm để đăng nhập";
+    }
+});
+
 // ================== BOOKING MODAL ==================
 const bookingSection = document.getElementById("booking");
 const bookingOverlay = document.getElementById("bookingOverlay");
@@ -314,14 +524,23 @@ function openBooking() {
     bookingSection.classList.add("show");
     bookingOverlay.classList.add("show");
     closeCart();
+    if (currentUser) {
+        document.getElementById("Mail").value = currentUser.email; // tự điền email tài khoản đang đăng nhập
+    }
 }
 function closeBooking() {
     bookingSection.classList.remove("show");
     bookingOverlay.classList.remove("show");
 }
 
-// Chỉ mở form đặt vé khi giỏ hàng đã có sản phẩm
+// Bắt buộc đăng nhập, sau đó mới kiểm tra giỏ hàng trước khi mở form đặt vé
 booking.addEventListener("click", () => {
+    if (!currentUser) {
+        alert("Vui lòng đăng nhập trước khi đặt hàng!");
+        closeCart();
+        openAuthModal("login");
+        return;
+    }
     if (cart.length === 0) {
         alert("Your shopping cart is empty. Please add products before placing your order!")
         return;
@@ -330,7 +549,10 @@ booking.addEventListener("click", () => {
 });
 closeBookingBtn.addEventListener("click", closeBooking);
 bookingOverlay.addEventListener("click", closeBooking);
-// ================== FORM ==================
+// ================== FORM (gửi đơn hàng lên mockapi.io) ==================
+// Endpoint mockapi.io thật của bạn
+const ORDERS_API_URL = "https://6a9a462a9a7ec1b817d2242e.mockapi.io/api/v1/order";
+
 const form = document.getElementById("myForm");
 const FIELDS = [
     { id: "Name", validate: v => v.trim() === "" ? "Write your name" : true },
@@ -348,10 +570,21 @@ const FIELDS = [
     }}
 ];
 
-form.addEventListener("submit", function (e) {
+// Chuyển tên sản phẩm thành slug (bỏ dấu, khoảng trắng -> gạch ngang, chữ thường)
+function slugify(str) {
+    return str
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // bỏ dấu tiếng Việt
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+}
+
+form.addEventListener("submit", async function (e) {
     e.preventDefault();
     document.querySelectorAll(".error").forEach(el => el.innerText = "");
     document.querySelectorAll("input").forEach(el => el.classList.remove("error-input"));
+    document.getElementById("successMsg").innerText = "";
 
     let isValid = true;
     FIELDS.forEach(field => {
@@ -363,9 +596,58 @@ form.addEventListener("submit", function (e) {
         }
     });
 
-    if (isValid) {
+    if (!isValid) return;
+
+    // Đảm bảo vẫn còn đăng nhập tại thời điểm gửi (phòng trường hợp bị đăng xuất giữa chừng)
+    if (!currentUser) {
+        alert("Phiên đăng nhập đã hết. Vui lòng đăng nhập lại.");
+        closeBooking();
+        openAuthModal("login");
+        return;
+    }
+
+    // Gộp dữ liệu khách hàng + giỏ hàng thành 1 order theo đúng cấu trúc mockapi.io
+    const order = {
+        createdAt: new Date().toISOString(),
+        userId: currentUser.uid, // gắn đơn hàng với tài khoản Firebase đang đăng nhập
+        name: document.getElementById("Name").value.trim(),
+        email: document.getElementById("Mail").value.trim(),
+        phone: document.getElementById("Phone").value.trim(),
+        address: "", // form hiện chưa có ô Address
+        message: document.getElementById("Content").value.trim(),
+        items: cart.map(item => ({
+            slug: slugify(item.name),
+            name: item.name,
+            price: item.price,
+            qty: item.qty
+        })),
+        total: totalPrice()
+    };
+
+    const submitBtn = form.querySelector("button[type='submit']");
+    submitBtn.disabled = true;
+    submitBtn.innerText = "Đang gửi...";
+
+    try {
+        const res = await fetch(ORDERS_API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(order)
+        });
+        if (!res.ok) throw new Error("Không thể gửi đơn hàng");
+        const saved = await res.json();
+        console.log("Đơn hàng đã lưu trên mockapi.io:", saved);
+
         document.getElementById("successMsg").innerText = "Booking successfully!";
         form.reset();
+        await clearCart(); // xóa giỏ hàng nội bộ sau khi đặt thành công
+        setTimeout(closeBooking, 1500);
+    } catch (err) {
+        console.error("Lỗi POST /orders:", err);
+        alert("Không thể gửi đơn hàng. Vui lòng kiểm tra kết nối và thử lại.");
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Complete";
     }
 });
 function showError(input, message) {

@@ -311,8 +311,10 @@
   background: black;
   color: white;
 }
-/* Booking modal overlay */
-.booking-overlay.show{
+.auth-overlay.show{
+    display: block;
+}
+.auth.show{
     display: block;
 }
 .contact.show{
