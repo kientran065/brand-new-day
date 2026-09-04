@@ -112,24 +112,132 @@
         <div class="container2" id="productsContainer"></div>
     </section>
     <!-- Auth modal (Login / Register) -->
-    <div class="auth-overlay hidden fixed inset-0 w-full h-full bg-black/60 z-[10002]" id="authOverlay"></div>
-    <section class="auth hidden gap-[20px] pt-[30px] px-[30px] pb-[25px] max-w-[380px] w-[90%] mx-auto fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] z-[10003]" id="authSection">
-        <span id="closeAuth" class="absolute top-[10px] right-[18px] text-[28px] leading-none cursor-pointer text-[#333] hover:text-red-600">&times;</span>
-        <div class="auth-tabs flex justify-center gap-[10px] mt-[10px] mb-[10px] border-b border-[#eee]">
-            <button type="button" id="tabLogin" class="font-bold px-[15px] py-[10px] border-b-2 border-red-600 text-red-600 bg-transparent">Đăng nhập</button>
-            <button type="button" id="tabRegister" class="font-bold px-[15px] py-[10px] border-b-2 border-transparent text-gray-400 bg-transparent">Đăng ký</button>
+<div class="auth-overlay hidden fixed inset-0 w-full h-full bg-black/60 z-[10002]" id="authOverlay"></div>
+
+<section
+    class="auth hidden gap-[20px] pt-[30px] px-[30px] pb-[25px] max-w-[380px] w-[90%] mx-auto fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-[8px] border border-gray-200 z-[10003]"
+    id="authSection"
+>
+
+    <!-- Close -->
+    <span
+        id="closeAuth"
+        class="absolute top-[10px] right-[18px] text-[28px] leading-none cursor-pointer text-[#333] hover:text-red-600"
+    >
+        &times;
+    </span>
+
+    <!-- Tabs -->
+    <div class="auth-tabs flex justify-center gap-[10px] mb-[20px] border-b border-[#eee]">
+
+        <button
+            type="button"
+            id="tabLogin"
+            class="font-bold px-[15px] py-[10px] border-b-2 border-black text-black bg-transparent"
+        >
+            Đăng nhập
+        </button>
+
+        <button
+            type="button"
+            id="tabRegister"
+            class="font-bold px-[15px] py-[10px] border-b-2 border-transparent text-gray-400 bg-transparent"
+        >
+            Đăng ký
+        </button>
+
+    </div>
+
+    <!-- Form -->
+    <form id="authForm" class="w-full">
+
+        <!-- Email -->
+        <div class="form-group mb-[20px] relative">
+
+            <label
+                for="AuthEmail"
+                class="block mb-[8px] text-[12px] font-medium text-black"
+            >
+                Email Address
+            </label>
+
+            <input
+                type="email"
+                id="AuthEmail"
+                placeholder="Email"
+                class="w-full h-[30px] p-[8px] box-border border border-[#ccc] outline-none rounded-[3px] text-[12px] focus:border-black"
+            >
+
         </div>
-        <form id="authForm" class="w-full">
-            <div class="form-group mb-[15px] relative">
-                <input type="email" id="AuthEmail" placeholder="Email" class="w-full mb-[15px] p-[10px] box-border border-2 border-[#ccc] outline-none rounded-[5px] transition duration-300 focus:border-[#007bff] focus:shadow-[0_0_5px_#007bff]">
-            </div>
-            <div class="form-group mb-[15px] relative">
-                <input type="password" id="AuthPassword" placeholder="Password (tối thiểu 6 ký tự)" class="w-full mb-[15px] p-[10px] box-border border-2 border-[#ccc] outline-none rounded-[5px] transition duration-300 focus:border-[#007bff] focus:shadow-[0_0_5px_#007bff]">
-            </div>
-            <button type="submit" id="authSubmitBtn" class="w-full bg-red-600 text-white px-[20px] py-[10px] border-none cursor-pointer font-bold rounded-[5px] hover:bg-[darkred]">Đăng nhập</button>
-            <p id="authMsg" class="text-center mt-[12px] text-[13px] text-red-600"></p>
-        </form>
-    </section>
+
+        <!-- Password -->
+        <div class="form-group mb-[15px] relative">
+
+            <label
+                for="AuthPassword"
+                class="block mb-[8px] text-[12px] font-medium text-black"
+            >
+                Password
+            </label>
+
+            <input
+                type="password"
+                id="AuthPassword"
+                placeholder="Password (tối thiểu 6 ký tự)"
+                class="w-full h-[30px] p-[8px] box-border border border-[#ccc] outline-none rounded-[3px] text-[12px] focus:border-black"
+            >
+
+        </div>
+
+        <!-- Terms -->
+        <p class="mt-[15px] text-center text-[10px] leading-[14px] text-gray-700">
+            By continuing, you agree to our
+            <span class="font-semibold">Terms of Service</span>
+            and
+            <span class="font-semibold">Privacy Policy.</span>
+        </p>
+
+        <!-- Submit -->
+        <button
+            type="submit"
+            id="authSubmitBtn"
+            class="w-full mt-[15px] h-[28px] bg-black text-white px-[20px] py-[6px] border-none cursor-pointer font-medium rounded-[3px] text-[12px] hover:bg-gray-800"
+        >
+            Sign In
+        </button>
+
+        <!-- OR -->
+        <div class="my-[15px] flex items-center gap-[10px]">
+
+            <div class="h-px flex-1 bg-gray-200"></div>
+
+            <span class="text-[10px] text-gray-500">
+                or
+            </span>
+
+            <div class="h-px flex-1 bg-gray-200"></div>
+
+        </div>
+
+        <!-- Google -->
+        <button
+            type="button"
+            id="googleSignInBtn"
+            class="w-full h-[30px] flex items-center justify-center gap-[8px] rounded-[3px] border border-gray-200 bg-white text-[12px] font-medium cursor-pointer hover:bg-gray-50"
+        >
+            <span class="text-[14px]">G</span>
+            <span>Sign in with Google</span>
+        </button>
+
+        <!-- Error / Success message -->
+        <p
+            id="authMsg"
+            class="text-center mt-[12px] text-[10px] text-red-600"
+        ></p>
+
+    </form>
+
+</section>
 
     <div class="booking-overlay hidden fixed inset-0 w-full h-full bg-black/60 z-[10002]" id="bookingOverlay"></div>
     <section class="contact hidden gap-[30px] pt-[30px] px-[30px] pb-[10px] max-w-[600px] w-[90%] mx-auto fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] z-[10003] max-h-[90vh] overflow-y-auto" id="booking">

@@ -437,18 +437,20 @@ function setAuthMode(mode) {
         authSubmitBtn.innerText = "Đăng ký";
     }
 }
-
 function openAuthModal(mode = "login") {
+    authOverlay.classList.remove("hidden");
+    authSection.classList.remove("hidden");
+
     setAuthMode(mode);
-    authForm.reset();
-    authSection.classList.add("show");
-    authOverlay.classList.add("show");
-}
-function closeAuthModal() {
-    authSection.classList.remove("show");
-    authOverlay.classList.remove("show");
 }
 
+function closeAuthModal() {
+    authOverlay.classList.add("hidden");
+    authSection.classList.add("hidden");
+
+    authMsg.innerText = "";
+    authForm.reset();
+}
 // Bấm vào icon user: chưa đăng nhập -> mở modal; đã đăng nhập -> hỏi đăng xuất
 navAuth.addEventListener("click", () => {
     if (currentUser) {
@@ -463,7 +465,21 @@ closeAuthBtn.addEventListener("click", closeAuthModal);
 authOverlay.addEventListener("click", closeAuthModal);
 tabLogin.addEventListener("click", () => setAuthMode("login"));
 tabRegister.addEventListener("click", () => setAuthMode("register"));
+const googleSignInBtn = document.getElementById("googleSignInBtn");
 
+googleSignInBtn.addEventListener("click", async () => {
+    try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+
+        await auth.signInWithPopup(provider);
+
+        closeAuthModal();
+
+    } catch (error) {
+        console.error(error);
+        authMsg.innerText = translateAuthError(error.code);
+    }
+});
 // Dịch mã lỗi Firebase sang thông báo tiếng Việt dễ hiểu
 function translateAuthError(code) {
     const map = {
