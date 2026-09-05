@@ -288,6 +288,7 @@ function renderCart() {
     cartTotalEl.innerText = totalQty();
     cartTotalPriceEl.innerText = totalPrice().toFixed(2);
     updateCartCount();
+    syncCartToFirebase(); // đồng bộ lên Firebase nếu đang đăng nhập (không làm gì nếu là khách)
 }
 
 // ---- POST: thêm sản phẩm vào giỏ (qua mockFetch) ----
@@ -403,6 +404,7 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const db = firebase.database(); // dùng để lưu & đồng bộ dữ liệu người dùng (hồ sơ, giỏ hàng)
 let currentUser = null; // user hiện tại (null nếu chưa đăng nhập)
 
 const navAuth = document.getElementById("navAuth");
@@ -558,16 +560,45 @@ authForm.addEventListener("submit", async (e) => {
 });
 
 // Theo dõi trạng thái đăng nhập, tự động cập nhật giao diện header
-auth.onAuthStateChanged((user) => {
+auth.onAuthStateChanged(async (user) => {
     currentUser = user;
     if (user) {
         authLabel.innerText = user.email.split("@")[0]; // hiện phần trước @ cho gọn
         navAuth.title = "Bấm để đăng xuất";
+
+        // Lưu / cập nhật hồ sơ cơ bản của user trên Firebase (users/{uid}/profile)
+        db.ref("users/" + user.uid + "/profile").update({
+            email: user.email,
+            lastLogin: new Date().toISOString()
+        }).catch(err => console.error("Lỗi lưu hồ sơ user:", err));
+
+        // Đồng bộ giỏ hàng: nếu tài khoản đã có giỏ hàng lưu trên Firebase -> tải về dùng;
+        // nếu chưa có mà máy đang có giỏ hàng khách -> đẩy giỏ hàng hiện tại lên Firebase
+        try {
+            const snap = await db.ref("users/" + user.uid + "/cart").once("value");
+            const remoteCart = snap.val();
+            if (remoteCart && remoteCart.length) {
+                cart = remoteCart;
+                saveCartToStorage(cart);
+                renderCart();
+            } else if (cart.length) {
+                syncCartToFirebase();
+            }
+        } catch (err) {
+            console.error("Lỗi đồng bộ giỏ hàng từ Firebase:", err);
+        }
     } else {
         authLabel.innerText = "Login";
         navAuth.title = "Bấm để đăng nhập";
     }
 });
+
+// Đẩy giỏ hàng hiện tại lên Firebase (users/{uid}/cart) - chỉ chạy khi đã đăng nhập
+function syncCartToFirebase() {
+    if (!currentUser) return;
+    db.ref("users/" + currentUser.uid + "/cart").set(cart)
+        .catch(err => console.error("Lỗi đồng bộ giỏ hàng lên Firebase:", err));
+}
 
 // ================== BOOKING MODAL ==================
 const bookingSection = document.getElementById("booking");
