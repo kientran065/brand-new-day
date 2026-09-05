@@ -398,11 +398,11 @@ const firebaseConfig = {
     storageBucket: "brandnewday-76f45.firebasestorage.app",
     messagingSenderId: "123888001540",
     appId: "1:123888001540:web:89162d8308b122699fcb51",
-    measurementId: "G-85DT28XCNF"
+    measurementId: "G-85DT28XCNF",
+    databaseURL: "https://brandnewday-76f45-default-rtdb.firebaseio.com"
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
-
 let currentUser = null; // user hiện tại (null nếu chưa đăng nhập)
 
 const navAuth = document.getElementById("navAuth");
@@ -417,6 +417,8 @@ const authSubmitBtn = document.getElementById("authSubmitBtn");
 const authMsg = document.getElementById("authMsg");
 const tabLogin = document.getElementById("tabLogin");
 const tabRegister = document.getElementById("tabRegister");
+const forgotPasswordWrap = document.getElementById("forgotPasswordWrap");
+const forgotPasswordLink = document.getElementById("forgotPasswordLink");
 
 let authMode = "login"; // "login" | "register"
 
@@ -429,12 +431,14 @@ function setAuthMode(mode) {
         tabRegister.classList.add("border-transparent", "text-gray-400");
         tabRegister.classList.remove("border-red-600", "text-red-600");
         authSubmitBtn.innerText = "Đăng nhập";
+        forgotPasswordWrap.classList.remove("hidden");
     } else {
         tabRegister.classList.add("border-red-600", "text-red-600");
         tabRegister.classList.remove("border-transparent", "text-gray-400");
         tabLogin.classList.add("border-transparent", "text-gray-400");
         tabLogin.classList.remove("border-red-600", "text-red-600");
         authSubmitBtn.innerText = "Đăng ký";
+        forgotPasswordWrap.classList.add("hidden"); // Đăng ký thì không cần quên mật khẩu
     }
 }
 function openAuthModal(mode = "login") {
@@ -449,6 +453,8 @@ function closeAuthModal() {
     authSection.classList.add("hidden");
 
     authMsg.innerText = "";
+    authMsg.classList.remove("text-green-600");
+    authMsg.classList.add("text-red-600");
     authForm.reset();
 }
 // Bấm vào icon user: chưa đăng nhập -> mở modal; đã đăng nhập -> hỏi đăng xuất
@@ -494,8 +500,40 @@ function translateAuthError(code) {
     return map[code] || "Đã có lỗi xảy ra, vui lòng thử lại.";
 }
 
+// Quên mật khẩu: gửi email đặt lại mật khẩu qua Firebase
+forgotPasswordLink.addEventListener("click", async () => {
+    authMsg.classList.remove("text-red-600");
+    authMsg.classList.remove("text-green-600");
+    const email = authEmailInput.value.trim();
+
+    if (!email) {
+        authMsg.classList.add("text-red-600");
+        authMsg.innerText = "Vui lòng nhập email ở trên trước, sau đó bấm lại 'Quên mật khẩu?'";
+        authEmailInput.focus();
+        return;
+    }
+
+    forgotPasswordLink.style.pointerEvents = "none";
+    forgotPasswordLink.innerText = "Đang gửi...";
+
+    try {
+        await auth.sendPasswordResetEmail(email);
+        authMsg.classList.add("text-green-600");
+        authMsg.innerText = `Đã gửi link đặt lại mật khẩu tới ${email}, vui lòng kiểm tra hộp thư (kể cả mục spam).`;
+    } catch (err) {
+        console.error("Lỗi gửi email đặt lại mật khẩu:", err);
+        authMsg.classList.add("text-red-600");
+        authMsg.innerText = translateAuthError(err.code);
+    } finally {
+        forgotPasswordLink.style.pointerEvents = "auto";
+        forgotPasswordLink.innerText = "Quên mật khẩu?";
+    }
+});
+
 authForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+    authMsg.classList.remove("text-green-600");
+    authMsg.classList.add("text-red-600");
     authMsg.innerText = "";
     const email = authEmailInput.value.trim();
     const password = authPasswordInput.value;
