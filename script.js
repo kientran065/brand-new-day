@@ -389,9 +389,6 @@ clearCartBtn.addEventListener("click", () => {
 });
 
 fetchCart(); // lấy giỏ hàng từ server khi load trang
-
-// ================== FIREBASE AUTHENTICATION ==================
-// TODO: thay bằng config thật lấy từ Firebase Console (Project settings > Your apps)
 const firebaseConfig = {
     apiKey: "AIzaSyDGATweoKsqIJHldK2I8pr1q9iT24RbkYE",
     authDomain: "brandnewday-76f45.firebaseapp.com",
@@ -742,6 +739,6 @@ function showError(input, message) {
 // ================== SCROLL TOP ==================
 const btn = document.getElementById("scrollTopBtn");
 window.addEventListener("scroll", () => {
-    btn.style.display = document.documentElement.scrollTop > 20 ? "block" : "none";
+    btn.style.display = document.documentElement.scrollTop > 1 ? "block" : "none";
 });
 btn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
