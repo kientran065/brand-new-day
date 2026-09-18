@@ -112,7 +112,8 @@ productsContainer.addEventListener("click", (e) => {
 
     if (cartIcon) {
         const qty = parseInt(item.querySelector(".qty-input").value) || 1;
-        addToCart(cartIcon.dataset.name, qty, parseFloat(cartIcon.dataset.price));
+        addToCart(cartIcon.dataset.name, qty, parseFloat(cartIcon.dataset.price))
+            .catch(() => alert("Không thể lưu giỏ hàng. Vui lòng thử lại."));
         openCart();
         return;
     }
@@ -128,9 +129,24 @@ productsContainer.addEventListener("change", (e) => {
     e.target.value = val;
 });
 
-// ================== CART (FastAPI thật) ==================
-const API_BASE_URL = "https://brand-new-day.onrender.com";
-const API_URL = `${API_BASE_URL}/cart`;
+// ================== FIREBASE: AUTHENTICATION & DATABASE ==================
+const firebaseConfig = {
+    apiKey: "AIzaSyDGATweoKsqIJHldK2I8pr1q9iT24RbkYE",
+    authDomain: "brandnewday-76f45.firebaseapp.com",
+    projectId: "brandnewday-76f45",
+    storageBucket: "brandnewday-76f45.firebasestorage.app",
+    messagingSenderId: "123888001540",
+    appId: "1:123888001540:web:89162d8308b122699fcb51",
+    measurementId: "G-85DT28XCNF",
+    databaseURL: "https://brandnewday-76f45-default-rtdb.firebaseio.com"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+let currentUser = null;
+
+// ================== CART (Firebase Realtime Database) ==================
 const cartCountEl = document.getElementById("cart-count");
 const floatCartCountEl = document.getElementById("float-cart-count");
 const cartItemsEl = document.getElementById("cartItems");
@@ -144,20 +160,22 @@ const closeCartBtn = document.getElementById("closeCart");
 const clearCartBtn = document.getElementById("clearCart");
 const booking = document.getElementById("Booking");
 
-// cart = [{ id, name, qty, price }], luôn đồng bộ với dữ liệu trên server
+// Cart của khách chỉ ở bộ nhớ tạm; khi đăng nhập, cart được lưu tại users/{uid}/cart.
 let cart = [];
 
-// ---- GET: lấy giỏ hàng khi tải trang ----
-async function fetchCart() {
+function normaliseCart(value) {
+    if (!value) return [];
+    return Array.isArray(value) ? value.filter(Boolean) : Object.values(value);
+}
+
+async function saveCartToFirebase() {
+    if (!currentUser) return;
     try {
-        const res = await fetch(`${API_URL}/`);
-        if (!res.ok) throw new Error("Không thể tải giỏ hàng");
-        cart = await res.json();
+        await db.ref(`users/${currentUser.uid}/cart`).set(cart);
     } catch (err) {
-        console.error("Lỗi GET /cart:", err);
-        cart = [];
+        console.error("Không thể lưu giỏ hàng vào Firebase:", err);
+        throw err;
     }
-    renderCart();
 }
 
 function totalQty() {
@@ -204,83 +222,46 @@ function renderCart() {
     cartTotalEl.innerText = totalQty();
     cartTotalPriceEl.innerText = totalPrice().toFixed(2);
     updateCartCount();
-    syncCartToFirebase(); // đồng bộ lên Firebase nếu đang đăng nhập (không làm gì nếu là khách)
 }
 
-// ---- POST: thêm sản phẩm vào giỏ ----
+// Giỏ hàng được cập nhật cục bộ trước rồi ghi trực tiếp vào Firebase.
 async function addToCart(name, qty, price) {
     const finalPrice = (price === undefined || price === null || isNaN(price)) ? (PRICE_MAP[name] || 0) : price;
-    try {
-        const res = await fetch(`${API_URL}/`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, qty, price: finalPrice })
-        });
-        if (!res.ok) throw new Error("Không thể thêm vào giỏ hàng");
-        cart = await res.json();
-        renderCart();
-    } catch (err) {
-        console.error("Lỗi POST /cart:", err);
-        alert("Không thể thêm sản phẩm vào giỏ.");
-    }
+    const existing = cart.find(item => item.name === name && item.price === finalPrice);
+    if (existing) existing.qty += qty;
+    else cart.push({
+        id: window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`,
+        name,
+        qty,
+        price: finalPrice
+    });
+    renderCart();
+    await saveCartToFirebase();
 }
 
-// ---- PUT: cập nhật số lượng theo id ----
 async function updateQty(id, qty) {
-    try {
-        const res = await fetch(`${API_URL}/update/${id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ qty })
-        });
-        if (!res.ok) throw new Error("Không thể cập nhật số lượng");
-        cart = await res.json();
-        renderCart();
-    } catch (err) {
-        console.error("Lỗi PUT /cart/update/:id:", err);
+    if (qty <= 0) cart = cart.filter(item => item.id !== id);
+    else {
+        const item = cart.find(item => item.id === id);
+        if (item) item.qty = qty;
     }
+    renderCart();
+    await saveCartToFirebase();
 }
 
-// ---- DELETE: xóa 1 sản phẩm theo id ----
 async function removeFromCart(id) {
-    try {
-        const res = await fetch(`${API_URL}/remove/${id}`, { method: "DELETE" });
-        if (!res.ok) throw new Error("Không thể xóa sản phẩm");
-        cart = await res.json();
-        renderCart();
-    } catch (err) {
-        console.error("Lỗi DELETE /cart/remove/:id:", err);
-    }
+    cart = cart.filter(item => item.id !== id);
+    renderCart();
+    await saveCartToFirebase();
 }
 
-// ---- DELETE: xóa toàn bộ giỏ hàng ----
 async function clearCart() {
-    try {
-        const res = await fetch(`${API_URL}/clear`, { method: "DELETE" });
-        if (!res.ok) throw new Error("Không thể xóa giỏ hàng");
-        cart = await res.json();
-        renderCart();
-    } catch (err) {
-        console.error("Lỗi DELETE /cart/clear:", err);
-    }
+    cart = [];
+    renderCart();
+    await saveCartToFirebase();
 }
 
-// ---- PUT: đẩy toàn bộ giỏ hàng lên server (dùng khi khôi phục giỏ hàng từ Firebase) ----
-async function replaceCartOnServer(items) {
-    try {
-        const res = await fetch(`${API_URL}/replace`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(items)
-        });
-        if (!res.ok) throw new Error("Không thể đồng bộ giỏ hàng lên server");
-        cart = await res.json();
-    } catch (err) {
-        console.error("Lỗi PUT /cart/replace:", err);
-    }
-}
-
-// Tăng/giảm/xóa sản phẩm trong giỏ (event delegation, gọi API tương ứng)
+// Tăng/giảm/xóa sản phẩm trong giỏ.
 cartItemsEl.addEventListener("click", (e) => {
     const minusBtn = e.target.closest(".cart-minus");
     const plusBtn = e.target.closest(".cart-plus");
@@ -292,11 +273,11 @@ cartItemsEl.addEventListener("click", (e) => {
     if (!item) return;
 
     if (minusBtn) {
-        updateQty(id, item.qty - 1); // server tự xóa nếu qty <= 0
+        updateQty(id, item.qty - 1).catch(() => alert("Không thể cập nhật giỏ hàng."));
     } else if (plusBtn) {
-        updateQty(id, item.qty + 1);
+        updateQty(id, item.qty + 1).catch(() => alert("Không thể cập nhật giỏ hàng."));
     } else if (removeBtn) {
-        removeFromCart(id);
+        removeFromCart(id).catch(() => alert("Không thể cập nhật giỏ hàng."));
     }
 });
 
@@ -316,24 +297,8 @@ closeCartBtn.addEventListener("click", closeCart);
 cartOverlay.addEventListener("click", closeCart);
 
 clearCartBtn.addEventListener("click", () => {
-    clearCart();
+    clearCart().catch(() => alert("Không thể xóa giỏ hàng."));
 });
-
-fetchCart(); // lấy giỏ hàng từ server khi load trang
-const firebaseConfig = {
-    apiKey: "AIzaSyDGATweoKsqIJHldK2I8pr1q9iT24RbkYE",
-    authDomain: "brandnewday-76f45.firebaseapp.com",
-    projectId: "brandnewday-76f45",
-    storageBucket: "brandnewday-76f45.firebasestorage.app",
-    messagingSenderId: "123888001540",
-    appId: "1:123888001540:web:89162d8308b122699fcb51",
-    measurementId: "G-85DT28XCNF",
-    databaseURL: "https://brandnewday-76f45-default-rtdb.firebaseio.com"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.database(); // dùng để lưu & đồng bộ dữ liệu người dùng (hồ sơ, giỏ hàng)
-let currentUser = null; // user hiện tại (null nếu chưa đăng nhập)
 
 const navAuth = document.getElementById("navAuth");
 const authLabel = document.getElementById("authLabel");
@@ -489,6 +454,7 @@ authForm.addEventListener("submit", async (e) => {
 
 // Theo dõi trạng thái đăng nhập, tự động cập nhật giao diện header
 auth.onAuthStateChanged(async (user) => {
+    const guestCart = cart;
     currentUser = user;
     if (user) {
         authLabel.innerText = user.email.split("@")[0]; // hiện phần trước @ cho gọn
@@ -500,32 +466,23 @@ auth.onAuthStateChanged(async (user) => {
             lastLogin: new Date().toISOString()
         }).catch(err => console.error("Lỗi lưu hồ sơ user:", err));
 
-        // Đồng bộ giỏ hàng: nếu tài khoản đã có giỏ hàng lưu trên Firebase -> tải về dùng;
-        // nếu chưa có mà máy đang có giỏ hàng khách -> đẩy giỏ hàng hiện tại lên Firebase
         try {
-            const snap = await db.ref("users/" + user.uid + "/cart").once("value");
-            const remoteCart = snap.val();
-            if (remoteCart && remoteCart.length) {
-                await replaceCartOnServer(remoteCart);
-                renderCart();
-            } else if (cart.length) {
-                syncCartToFirebase();
-            }
+            const snapshot = await db.ref(`users/${user.uid}/cart`).once("value");
+            const savedCart = normaliseCart(snapshot.val());
+            cart = savedCart.length ? savedCart : guestCart;
+            if (!savedCart.length && guestCart.length) await saveCartToFirebase();
         } catch (err) {
-            console.error("Lỗi đồng bộ giỏ hàng từ Firebase:", err);
+            console.error("Không thể tải giỏ hàng từ Firebase:", err);
+            cart = guestCart;
         }
+        renderCart();
     } else {
         authLabel.innerText = "Login";
         navAuth.title = "Bấm để đăng nhập";
+        cart = [];
+        renderCart();
     }
 });
-
-// Đẩy giỏ hàng hiện tại lên Firebase (users/{uid}/cart) - chỉ chạy khi đã đăng nhập
-function syncCartToFirebase() {
-    if (!currentUser) return;
-    db.ref("users/" + currentUser.uid + "/cart").set(cart)
-        .catch(err => console.error("Lỗi đồng bộ giỏ hàng lên Firebase:", err));
-}
 
 // ================== BOOKING MODAL ==================
 const bookingSection = document.getElementById("booking");
@@ -561,8 +518,7 @@ booking.addEventListener("click", () => {
 });
 closeBookingBtn.addEventListener("click", closeBooking);
 bookingOverlay.addEventListener("click", closeBooking);
-// ================== FORM (gửi đơn hàng đến FastAPI) ==================
-const ORDERS_API_URL = `${API_BASE_URL}/orders`;
+// ================== FORM (lưu đơn hàng vào Firebase) ==================
 
 const form = document.getElementById("myForm");
 const FIELDS = [
@@ -617,7 +573,7 @@ form.addEventListener("submit", async function (e) {
         return;
     }
 
-    // Gộp dữ liệu khách hàng + giỏ hàng để FastAPI lưu vào backend/orders.json.
+    // Mỗi đơn hàng được lưu riêng theo tài khoản ở users/{uid}/orders.
     const order = {
         user_id: currentUser.uid, // gắn đơn hàng với tài khoản Firebase đang đăng nhập
         name: document.getElementById("Name").value.trim(),
@@ -639,14 +595,13 @@ form.addEventListener("submit", async function (e) {
     submitBtn.innerText = "Đang gửi...";
 
     try {
-        const res = await fetch(ORDERS_API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(order)
+        const orderRef = db.ref(`users/${currentUser.uid}/orders`).push();
+        await orderRef.set({
+            ...order,
+            id: orderRef.key,
+            createdAt: firebase.database.ServerValue.TIMESTAMP
         });
-        if (!res.ok) throw new Error("Không thể gửi đơn hàng");
-        const saved = await res.json();
-        console.log("Đơn hàng đã lưu trong orders.json:", saved);
+        console.log("Đơn hàng đã lưu trong Firebase:", orderRef.key);
 
         document.getElementById("successMsg").innerText = "Booking successfully!";
         form.reset();
