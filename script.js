@@ -129,8 +129,8 @@ productsContainer.addEventListener("change", (e) => {
 });
 
 // ================== CART (FastAPI thật) ==================
-const API_URL = "http://localhost:8000/cart";
-
+const API_BASE_URL = "https://brand-new-day.onrender.com";
+const API_URL = `${API_BASE_URL}/cart`;
 const cartCountEl = document.getElementById("cart-count");
 const floatCartCountEl = document.getElementById("float-cart-count");
 const cartItemsEl = document.getElementById("cartItems");
@@ -562,7 +562,7 @@ booking.addEventListener("click", () => {
 closeBookingBtn.addEventListener("click", closeBooking);
 bookingOverlay.addEventListener("click", closeBooking);
 // ================== FORM (gửi đơn hàng đến FastAPI) ==================
-const ORDERS_API_URL = "http://localhost:8000/orders";
+const ORDERS_API_URL = `${API_BASE_URL}/orders`;
 
 const form = document.getElementById("myForm");
 const FIELDS = [
