@@ -128,92 +128,8 @@ productsContainer.addEventListener("change", (e) => {
     e.target.value = val;
 });
 
-// ================== CART (MOCK API dùng fetch giả lập, không cần backend) ==================
-const API_URL = "http://localhost:3000/api/cart";
-// Độ trễ giả lập (ms) để giữ cảm giác gọi API qua mạng thật
-const MOCK_DELAY = 300;
-
-// Sinh id ngẫu nhiên cho item mới (thay cho id do server sinh ra trước đây)
-function generateId() {
-    return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-}
-
-// Đọc / ghi giỏ hàng vào localStorage - đóng vai trò "database" của mock server
-function loadCartFromStorage() {
-    try {
-        const raw = localStorage.getItem("spiderverse_cart");
-        return raw ? JSON.parse(raw) : [];
-    } catch (err) {
-        console.error("Lỗi đọc giỏ hàng từ localStorage:", err);
-        return [];
-    }
-}
-
-function saveCartToStorage(data) {
-    try {
-        localStorage.setItem("spiderverse_cart", JSON.stringify(data));
-    } catch (err) {
-        console.error("Lỗi lưu giỏ hàng vào localStorage:", err);
-    }
-}
-
-// ---- MOCK FETCH: đóng vai "backend", xử lý GET/POST/PUT/DELETE giống hệt server thật ----
-// Trả về Promise<Response> y hệt fetch() thật (.ok, .status, .json()), nên phần code
-// gọi bên dưới viết đúng như đang gọi fetch tới một API thật.
-function mockFetch(url, options = {}) {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            try {
-                const method = (options.method || "GET").toUpperCase();
-                const idMatch = url.match(new RegExp(`^${API_URL}/(.+)$`));
-                const id = idMatch ? idMatch[1] : null;
-                let data = loadCartFromStorage();
-                let responseData;
-
-                if (method === "GET") {
-                    responseData = data;
-
-                } else if (method === "POST") {
-                    const body = JSON.parse(options.body || "{}");
-                    const existing = data.find(i => i.name === body.name && i.price === body.price);
-                    if (existing) existing.qty += body.qty;
-                    else data.push({ id: generateId(), name: body.name, qty: body.qty, price: body.price });
-                    saveCartToStorage(data);
-                    responseData = data;
-
-                } else if (method === "PUT" && id) {
-                    const body = JSON.parse(options.body || "{}");
-                    if (body.qty <= 0) {
-                        data = data.filter(i => i.id !== id); // tự xóa nếu qty <= 0
-                    } else {
-                        const item = data.find(i => i.id === id);
-                        if (item) item.qty = body.qty;
-                    }
-                    saveCartToStorage(data);
-                    responseData = data;
-
-                } else if (method === "DELETE" && id) {
-                    data = data.filter(i => i.id !== id);
-                    saveCartToStorage(data);
-                    responseData = data;
-
-                } else if (method === "DELETE" && !id) {
-                    data = [];
-                    saveCartToStorage(data);
-                    responseData = data;
-
-                } else {
-                    resolve({ ok: false, status: 404, json: () => Promise.resolve({ error: "Not found" }) });
-                    return;
-                }
-
-                resolve({ ok: true, status: 200, json: () => Promise.resolve(responseData) });
-            } catch (err) {
-                reject(err);
-            }
-        }, MOCK_DELAY);
-    });
-}
+// ================== CART (FastAPI thật) ==================
+const API_URL = "http://localhost:8000/cart";
 
 const cartCountEl = document.getElementById("cart-count");
 const floatCartCountEl = document.getElementById("float-cart-count");
@@ -231,14 +147,14 @@ const booking = document.getElementById("Booking");
 // cart = [{ id, name, qty, price }], luôn đồng bộ với dữ liệu trên server
 let cart = [];
 
-// ---- GET: lấy giỏ hàng khi tải trang (qua mockFetch, xử lý bất đồng bộ với await) ----
+// ---- GET: lấy giỏ hàng khi tải trang ----
 async function fetchCart() {
     try {
-        const res = await mockFetch(API_URL);
+        const res = await fetch(`${API_URL}/`);
         if (!res.ok) throw new Error("Không thể tải giỏ hàng");
         cart = await res.json();
     } catch (err) {
-        console.error("Lỗi GET /api/cart:", err);
+        console.error("Lỗi GET /cart:", err);
         cart = [];
     }
     renderCart();
@@ -291,11 +207,11 @@ function renderCart() {
     syncCartToFirebase(); // đồng bộ lên Firebase nếu đang đăng nhập (không làm gì nếu là khách)
 }
 
-// ---- POST: thêm sản phẩm vào giỏ (qua mockFetch) ----
+// ---- POST: thêm sản phẩm vào giỏ ----
 async function addToCart(name, qty, price) {
     const finalPrice = (price === undefined || price === null || isNaN(price)) ? (PRICE_MAP[name] || 0) : price;
     try {
-        const res = await mockFetch(API_URL, {
+        const res = await fetch(`${API_URL}/`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name, qty, price: finalPrice })
@@ -304,15 +220,15 @@ async function addToCart(name, qty, price) {
         cart = await res.json();
         renderCart();
     } catch (err) {
-        console.error("Lỗi POST /api/cart:", err);
+        console.error("Lỗi POST /cart:", err);
         alert("Không thể thêm sản phẩm vào giỏ.");
     }
 }
 
-// ---- PUT: cập nhật số lượng theo id (qua mockFetch) ----
+// ---- PUT: cập nhật số lượng theo id ----
 async function updateQty(id, qty) {
     try {
-        const res = await mockFetch(`${API_URL}/${id}`, {
+        const res = await fetch(`${API_URL}/update/${id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ qty })
@@ -321,31 +237,46 @@ async function updateQty(id, qty) {
         cart = await res.json();
         renderCart();
     } catch (err) {
-        console.error("Lỗi PUT /api/cart/:id:", err);
+        console.error("Lỗi PUT /cart/update/:id:", err);
     }
 }
 
-// ---- DELETE: xóa 1 sản phẩm theo id (qua mockFetch) ----
+// ---- DELETE: xóa 1 sản phẩm theo id ----
 async function removeFromCart(id) {
     try {
-        const res = await mockFetch(`${API_URL}/${id}`, { method: "DELETE" });
+        const res = await fetch(`${API_URL}/remove/${id}`, { method: "DELETE" });
         if (!res.ok) throw new Error("Không thể xóa sản phẩm");
         cart = await res.json();
         renderCart();
     } catch (err) {
-        console.error("Lỗi DELETE /api/cart/:id:", err);
+        console.error("Lỗi DELETE /cart/remove/:id:", err);
     }
 }
 
-// ---- DELETE: xóa toàn bộ giỏ hàng (qua mockFetch) ----
+// ---- DELETE: xóa toàn bộ giỏ hàng ----
 async function clearCart() {
     try {
-        const res = await mockFetch(API_URL, { method: "DELETE" });
+        const res = await fetch(`${API_URL}/clear`, { method: "DELETE" });
         if (!res.ok) throw new Error("Không thể xóa giỏ hàng");
         cart = await res.json();
         renderCart();
     } catch (err) {
-        console.error("Lỗi DELETE /api/cart:", err);
+        console.error("Lỗi DELETE /cart/clear:", err);
+    }
+}
+
+// ---- PUT: đẩy toàn bộ giỏ hàng lên server (dùng khi khôi phục giỏ hàng từ Firebase) ----
+async function replaceCartOnServer(items) {
+    try {
+        const res = await fetch(`${API_URL}/replace`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(items)
+        });
+        if (!res.ok) throw new Error("Không thể đồng bộ giỏ hàng lên server");
+        cart = await res.json();
+    } catch (err) {
+        console.error("Lỗi PUT /cart/replace:", err);
     }
 }
 
@@ -575,8 +506,7 @@ auth.onAuthStateChanged(async (user) => {
             const snap = await db.ref("users/" + user.uid + "/cart").once("value");
             const remoteCart = snap.val();
             if (remoteCart && remoteCart.length) {
-                cart = remoteCart;
-                saveCartToStorage(cart);
+                await replaceCartOnServer(remoteCart);
                 renderCart();
             } else if (cart.length) {
                 syncCartToFirebase();
@@ -631,9 +561,8 @@ booking.addEventListener("click", () => {
 });
 closeBookingBtn.addEventListener("click", closeBooking);
 bookingOverlay.addEventListener("click", closeBooking);
-// ================== FORM (gửi đơn hàng lên mockapi.io) ==================
-// Endpoint mockapi.io thật của bạn
-const ORDERS_API_URL = "https://6a9a462a9a7ec1b817d2242e.mockapi.io/api/v1/order";
+// ================== FORM (gửi đơn hàng đến FastAPI) ==================
+const ORDERS_API_URL = "http://localhost:8000/orders";
 
 const form = document.getElementById("myForm");
 const FIELDS = [
@@ -688,10 +617,9 @@ form.addEventListener("submit", async function (e) {
         return;
     }
 
-    // Gộp dữ liệu khách hàng + giỏ hàng thành 1 order theo đúng cấu trúc mockapi.io
+    // Gộp dữ liệu khách hàng + giỏ hàng để FastAPI lưu vào backend/orders.json.
     const order = {
-        createdAt: new Date().toISOString(),
-        userId: currentUser.uid, // gắn đơn hàng với tài khoản Firebase đang đăng nhập
+        user_id: currentUser.uid, // gắn đơn hàng với tài khoản Firebase đang đăng nhập
         name: document.getElementById("Name").value.trim(),
         email: document.getElementById("Mail").value.trim(),
         phone: document.getElementById("Phone").value.trim(),
@@ -718,7 +646,7 @@ form.addEventListener("submit", async function (e) {
         });
         if (!res.ok) throw new Error("Không thể gửi đơn hàng");
         const saved = await res.json();
-        console.log("Đơn hàng đã lưu trên mockapi.io:", saved);
+        console.log("Đơn hàng đã lưu trong orders.json:", saved);
 
         document.getElementById("successMsg").innerText = "Booking successfully!";
         form.reset();

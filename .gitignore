@@ -1,0 +1,10 @@
+# Local runtimes and package installs
+.venv/
+node_modules/
+__pycache__/
+*.py[cod]
+
+# Runtime data: may contain customer details; do not publish it.
+backend/cart.json
+backend/orders.json
+backend/*.tmp
