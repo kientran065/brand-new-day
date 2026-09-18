@@ -617,10 +617,10 @@ form.addEventListener("submit", async function (e) {
         });
         console.log("Đơn hàng đã lưu trong Firebase:", orderRef.key);
 
-        document.getElementById("successMsg").innerText = "Booking successfully!";
+        document.getElementById("successMsg").innerText = "Booking successfully! Đơn hàng đã được lưu vào Firebase.";
         form.reset();
         await clearCart(); // xóa giỏ hàng nội bộ sau khi đặt thành công
-        setTimeout(closeBooking, 1500);
+        // Giữ thông báo mở để người mua có thể xác nhận; họ tự đóng bằng nút ×.
     } catch (err) {
         console.error("Lỗi POST /orders:", err);
         alert("Không thể gửi đơn hàng. Vui lòng kiểm tra kết nối và thử lại.");
