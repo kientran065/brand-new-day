@@ -596,10 +596,24 @@ form.addEventListener("submit", async function (e) {
 
     try {
         const orderRef = db.ref(`users/${currentUser.uid}/orders`).push();
-        await orderRef.set({
+        const savedOrder = {
             ...order,
             id: orderRef.key,
             createdAt: firebase.database.ServerValue.TIMESTAMP
+        };
+
+        // Lưu đồng thời lịch sử đầy đủ và bản tóm tắt dễ xem trong profile.
+        await db.ref().update({
+            [`users/${currentUser.uid}/orders/${orderRef.key}`]: savedOrder,
+            [`users/${currentUser.uid}/profile/latestPurchase`]: {
+                orderId: orderRef.key,
+                name: order.name,
+                email: order.email,
+                phone: order.phone,
+                items: order.items,
+                total: order.total,
+                createdAt: firebase.database.ServerValue.TIMESTAMP
+            }
         });
         console.log("Đơn hàng đã lưu trong Firebase:", orderRef.key);
 

@@ -6,7 +6,7 @@ data persistence.
 
 Data is scoped by Firebase Authentication UID:
 
-- `users/{uid}/profile`
+- `users/{uid}/profile/latestPurchase` (người mua, sản phẩm, số lượng, tổng tiền)
 - `users/{uid}/cart`
 - `users/{uid}/orders/{orderId}`
 
